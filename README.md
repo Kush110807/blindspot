@@ -2,103 +2,71 @@
 
 **Practice decisions when the road ahead is hidden.**
 
-BlindSpot is a proposed, phone-friendly road-visibility decision-practice experience for adult novice two-wheeler riders. The planned interaction asks a learner to notice restricted visibility, select an initial response and a main reason, then examine feedback based on the evidence visible *before* any outcome is revealed.
+BlindSpot is a **three-scene, phone-friendly React + TypeScript prototype** for practising observation and decision reasoning when the view of the road is blocked. It is intended for adult novice two-wheeler riders. This is a fictional illustrated learning exercise, **not a riding simulator, validated safety intervention or replacement for qualified instruction**.
 
-> **Current status: M1 accepted at `3bb4fff2c6ba5abcb0d16ae22766f3de91c3b47e`; A-owned runtime integration is a NEW independent review candidate on branch `integration/a-m2-runtime`.** This repository currently contains a React + TypeScript project skeleton, a foundation-status screen, reusable scene/attempt/feedback/geometry/record contracts and their tests. **It is not yet the working three-scene competition prototype.** No learner trial, qualified instructor review or road-safety outcome has been established.
+**Integration status:** This branch combines the accepted A runtime (`1d711b14f96eaea9e3b311c10b260abe9ac2d08f`), B original scene implementation plus accepted content repair (`e0c6a0f` → `bcd0b5d`), and C original interface implementation plus accepted repair (`ac5e803` → `42175db`). Both worker histories remain in Git. The integrated candidate awaits independent acceptance. Nothing has been published or submitted.
 
 ## Requirements
 
-- Node.js **22.16.x** (the manifest supports `>=22.16.0 <23`; other minor releases are not yet verified)
-- npm **10.x**
-- A modern desktop or mobile browser
-- An internet connection for the first dependency installation; no runtime API or hosted service is required
+- Node.js **22.16.x**, npm **10.x** (`package.json` requires Node `>=22.16.0 <23`)
+- A modern browser with JavaScript enabled
+- Network access for **the first dependency installation only**; no runtime API, login or server-side service
 
-## Getting started
+## Clean installation and execution
 
 ```bash
-# From the folder containing package.json
 node --version
 npm --version
-npm install
-npm run dev
-```
-
-Open the local URL printed by Vite (usually `http://localhost:5173/`). You should see the **BlindSpot** heading and **“The foundation is in place.”** A decorative CSS road is a placeholder, not a validated learning scene.
-
-**Dependency baseline:** A genuine npm v3 lockfile is committed at the accepted M1 baseline, matching `package.json` (including Vite `6.4.4`). Windows evidence under Node 22.16.0/npm 10.9.2 documents successful `npm ci`, `npm run check`, `npm run verify:repo`, production build, and desktop/375px browser-emulated rendering. This integration sandbox independently runs the dependency-free tests, but could not repeat `npm ci` or the React build because required npm package tarballs are not cached and npm registry access is unavailable. Run `npm ci` and the checks below on a connected machine before integrating B/C and again before release.
-### Commands
-
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start Vite development server (default port 5173). |
-| `npm run build` | Run full TypeScript typecheck and emit production files to `dist/`. |
-| `npm run preview` | Preview an existing production build locally. |
-| `npm run typecheck` | Check the full app's TypeScript types. |
-| `npm run test` | Run dependency-free Node contract tests. |
-| `npm run check` | Run contract tests and production build. |
-| `npm run verify:repo` | Audit required repo files, lockfile parity and tracked-file exclusions. |
-
-After the lockfile is committed, use these **clean-check commands** (rather than `npm install`) for release verification:
-
-```bash
 npm ci
 npm run test
 npm run typecheck
 npm run build
 npm run verify:repo
-npm run dev       # confirm the page in a real browser
+npm run dev
 ```
 
-To verify production preview, stop the dev server and run `npm run preview`. Use a real phone or responsive browser viewport for a layout check. Do not claim those checks passed until they were actually performed.
+Visit Vite's local URL, normally `http://localhost:5173/`. For a production smoke test, stop the dev server and run `npm run preview` after a successful build.
 
-## Implemented in M0/M1
+| Command | Purpose |
+| --- | --- |
+| `npm ci` | Install exact locked versions from committed `package-lock.json`. |
+| `npm run dev` | Start development server. |
+| `npm run test` | Run Node contract, runtime and accepted-scene integration tests. |
+| `npm run typecheck` | Check full TypeScript app. |
+| `npm run build` | Typecheck and produce a Vite bundle in `dist/`. |
+| `npm run verify:repo` | Verify lockfile structure and tracked-file hygiene (must run on clean commit). |
+| `npm run check` | Test plus production build. |
+| `npm run preview` | Serve built application locally. |
 
-- **Minimal interface:** React mount-status screen with a CSS-only illustrative backdrop and non-sensitive storage diagnostics.
-- **Versioned scene model:** authored scene identifier and revision, training/assessment purpose, fixed visible conditions, normalized tap rectangles, optional actor overlays, two-language authored strings (English/Hindi), stable response/reason/ending IDs and content-review status.
-- **Answer state and locking:** explicit selection of region **or none**, response and main reason; incomplete answers cannot lock. Locked answers remain immutable across review/replay. The order of displayed answer choices is recorded separately from their semantic IDs.
-- **Feedback contracts:** recognition/response/reason explanations selected by IDs; no hints for assessments before lock. No ending-dependent assessment. Provisional or invalidly documented instructor-review content does not produce reviewed correctness classifications.
-- **Tap geometry helpers:** `object-fit: contain` mapping, letterboxing-safe point translation and region overlays; neutral keyboard-choice contract.
-- **Local records:** versioned, privacy-minimal attempt records and graceful missing/blocked/corrupt-storage fallback. The future app will persist completed attempts at lock time; this foundation screen does not yet collect learner attempts.
-- **Automated tests:** the accepted 20 foundation contract tests plus 8 A-owned coordinator regression tests (28 passing in the integration sandbox). They do not replace full browser and integration testing.
+### Actual verification scope
 
-**A-owned orchestration candidate (after accepted M1):** `src/integration/coordinator.ts`, `usePracticeCoordinator.ts`, and `src/App.tsx` now implement an internal three-scene session coordinator: locale and answer state, lock-once records, feedback gating, sequential training continuation/next-scene guards, explicit restart, error-preserving local storage fallback, and stable-ID navigation. The B catalogue and C screen are deliberately not imported until their separately owned patches are independently reviewed; `src/integration/slots.ts` is the sole A-owned wiring location. The foundation placeholder remains the visible screen until that integration. The favicon SVG and ICO are original authored assets at `public/favicon.*`.
+The integration environment independently passes Node's 34 integration+contract tests and validates the authored SVG files. It **cannot complete `npm ci`** because the registry is unreachable and required package tarballs are not cached (notably Vite 6.4.4). Consequently the integrated React full typecheck/build **cannot be verified in this environment**. The previous Windows evidence showed a passing build of the **M1 foundation**, not this combined application. Desktop and 375px browser rendering, including accessibility and localStorage cases, must be performed on a machine where `npm ci` succeeds before integration acceptance. See `docs/ACCEPTED_WORKER_INTEGRATION.md` for the actual command results and outstanding UI verification steps. Do not treat this source-only integration as a finished release.
 
-**Not yet integrated:** complete bus-training scene, unfamiliar blocked-view scene, clear-view control, gameplay/tapping UI, actual on-screen continuation/replay, runtime Hindi control, authored scene art or translated scene content. No validated correctness scores, analysis dashboard or learner evaluation is included.
+## Included scenes and functionality
 
-## Roadmap, contracts and collaboration
+1. **Parked-bus training:** identify a region (or none), choose a response and a reason, lock, read provisional explanations based on the original evidence, then view **both** authored continuations and replay without resetting the recorded answer.
+2. **Unfamiliar blocked-view example:** an assessment-style changed layout, with explanation withheld until the attempt is locked and review is opened.
+3. **Matched clear-view control:** includes an explicit “no relevant blocked region” selection; caution is not automatically classified as wrong.
 
-The committed prototype scope (future M2/M3) is **one paired bus-training scene**, **one unfamiliar blocked-view scene**, and **one matched clear-view control**. The training scene must show both continuations starting from identical initial evidence. A clear-view scene offers an explicit **“no relevant blocked region”** choice; caution alone is not marked wrong. Scene data and answer orders must not reveal the result before a response locks.
+The interface supports English/Hindi scene and control text, 375px responsive layout authored by Chat C, scaled image tap rectangles plus selectable keyboard-accessible region controls, shuffle-safe response/reason IDs, immutable locked records, explicit restart/next navigation and client-side local record storage. Storage errors/corruption fall back to in-memory records without overwriting damaged storage. No personal information is requested or saved.
 
-| Workstream | Owns | Cannot change without integration approval |
-| --- | --- | --- |
-| **A — foundation/integration** | `src/contracts/`, `src/engine/`, `src/records/`, `src/App.tsx`, tooling, `package*.json`, tests, root docs/release | Submitted scope or independently owned B/C content |
-| **B — scene content/language** | `src/content/scenes/`, `src/content/i18n/`, `public/scenes/`, `docs/CONTENT_NOTES_B.md` | Contracts, engines, tooling, interface |
-| **C — interface** | `src/ui/`, new C-owned practice CSS, `docs/INTERFACE_NOTES_C.md` | Contracts, correctness rules, assets, tooling |
+**All explanations, provisional rubric candidates and accepted-response alternatives remain UNREVIEWED by a qualified instructor.** The app never displays validated correctness scores, aggregate competence scores or claimed crash reduction. No backend, account, learner study, driving physics engine or live AI is included. The matched assessment examples are authored static illustrations rather than a prediction of actual road risks.
 
-**Start dependent work only from an independently accepted commit SHA.** See [Contracts and B/C export interfaces](docs/CONTRACTS.md), [Exact file ownership](docs/FILE_OWNERSHIP.md), [Roadmap reference](docs/CODING_ROADMAP_REFERENCE.md) and [Repository release checklist](docs/REPOSITORY_CHECKLIST.md). The included `tests/fixture.ts` exists only for automated tests, not learner-facing content.
+## Ownership and integration contracts
 
-## Educational review, privacy and safety limitations
+- **A:** `src/App.tsx`, `src/integration/`, `src/contracts/`, `src/engine/`, `src/records/`, build/dependencies, automated tests, release and repository documentation.
+- **B:** `src/content/scenes/`, `src/content/i18n/`, `public/scenes/`, `docs/CONTENT_NOTES_B.md`.
+- **C:** `src/ui/`, `src/styles/practice.css`, `docs/INTERFACE_NOTES_C.md`.
 
-- **All current instructional/rubric content is provisional.** No qualified riding instructor has reviewed BlindSpot's scene conditions, accepted alternatives or feedback. A test-only instructor-reviewed stub is not real approval. Do not conduct scored learner evaluation until genuine review is documented.
-- No general driving physics/visibility model; no prediction of collision avoidance. Static illustrated scenarios do not reproduce road conditions, and no crash reduction or transfer to real riding has been shown.
-- No accounts, personal identifiers, analytics, backend, login, GPS or live AI. Proposed local records contain stable scene/choice IDs, versions, displayed choice order and a lock timestamp. Local-storage availability is not guaranteed.
-- Assessment modes must not show explanations, accepted regions or hidden actors before answer lock. The *same initial scene* determines assessment independently of either ending.
-- This integration branch is **not the final hackathon submission**. M1 desktop and 375px browser-emulated screenshots and successful build were supplied from Windows; the A-owned runtime candidate has not been browser-verified with B/C components, and independent full build remains blocked by unavailable npm dependencies. A physical-phone test remains unexecuted. See [M1 historical verification](docs/M1_REPAIR_VERIFICATION.md) and [A integration handoff](docs/A_INTEGRATION_HANDOFF.md).
+A's `src/integration/slots.ts` connects B's `scenes` named export to C's `PracticeScreen` named export. A alone owns locale state, progression, answer locking, persistence, review-gated feedback and navigation. See [contracts](docs/CONTRACTS.md), [ownership](docs/FILE_OWNERSHIP.md) and [integration evidence](docs/ACCEPTED_WORKER_INTEGRATION.md). The shared v1 schema and frozen B/C interfaces were not changed during integration.
 
-## Assets and source credits
+## Assets, privacy and limitations
 
-See [Assets & source credits](docs/ASSET_CREDITS.md).
+- Three vector base scenes and one pedestrian continuation overlay are bundled under `public/scenes/`, originally authored for this project. See `docs/CONTENT_NOTES_B.md` and `docs/ASSET_CREDITS.md` for creator/provenance and review status.
+- Brand/favicon are original vector/CSS work; no external fonts, stock photos, soundtrack, personal data, or private credentials are included. React and Vite retain their own package licenses.
+- All scene conditions and feedback are provisional; screenshots or programming tests do **not** constitute instructor validation or evidence of real-world safety benefit.
+- Corrupt local storage is retained without automatic replacement; a failed save means in-memory attempts may be lost after refresh. The local browser cannot guarantee secure storage.
+- Narrow-width browser emulation is not a physical phone test. Full browser, keyboard, storage, dev-console and responsive acceptance checks for this **combined** version are pending until dependencies can be installed.
+- No GitHub remote, deployment or submission has been authorised. The final repository should exclude `node_modules/`, `dist/`, credentials, local records and personal identifiers.
 
-- Current road illustration: **repository-authored CSS shapes** in `src/styles/foundation.css`; not an assessment image, and no outside graphics were used.
-- Current fonts: device/system sans-serif stack; no external font files.
-- No third-party image assets, datasets or sounds bundled at M0/M1. `public/scenes/README.md` is a future asset slot, not an actual road-scene asset.
-- Design/scoping references: *BlindSpot_Hackoverflow_Submission_Ready(1).pdf* (the previously submitted proposal, not redistributed here) and the bundled coding roadmap reference. Proposed rider-safety sources are listed in that proposal; **citation is not validation of BlindSpot**.
-- New artwork must have documented creator, source/permission and correspondence between actual scene bounds and tap overlays before integration.
-
-## Repository / release status
-
-This is a **local Git repository; no GitHub remote has been configured and nothing has been published or submitted.** M1 was independently accepted, and B/C have now been explicitly released against the exact accepted baseline. This new A integration branch requires independent review before merge. Git history is included in the handoff ZIP for traceable integration. The only valid GitHub submission URL will be one you choose after repository creation/push and full acceptance checks.
-
-`node_modules/`, generated `dist/`, local records, secret/env files and credentials are excluded from Git. Keep npm authentication outside the tracked `.npmrc` (which contains only non-secret configuration). See [repository checklist](docs/REPOSITORY_CHECKLIST.md) before making any GitHub repository public.
-
-**License:** No open-source license has been granted in this foundation. Decide the appropriate license/repository visibility explicitly before publishing.
+The proposal (`BlindSpot_Hackoverflow_Submission_Ready(1).pdf`) guided this scope but is not distributed in the repository. Additional sources and their non-validation status are recorded in the asset ledger. **No open-source project license is granted by this repository; decide repository visibility/license before publication.**

@@ -89,3 +89,8 @@ These imports/exports are **frozen contracts; B/C components are still separate 
 The current competition prototype deliberately returns `reviewedCriteria: null` regardless of a test-only metadata claim and `catalogueErrors` refuses any non-provisional authored scene. Explanatory feedback is supplied only in `review`, not `observe`, `answering` or `locked`. A training scene can advance only after its second continuation; replay does not unlock and resets the next-scene gate. Failed storage stays in memory, and an already corrupt local store is never overwritten automatically.
 
 `src/integration/slots.ts` is A's temporary build-safe seam: it exports `scenes: SceneCatalogue = []` and `PracticeScreen: ComponentType<PracticeScreenProps> | null = null`. Once both worker commits have been independently reviewed, A replaces only those exports with B's named `scenes` and C's named `PracticeScreen`; `src/App.tsx` already wires all eleven callbacks. The foundation mount screen remains until then. No schema/record migrations or frozen interface changes occurred.
+
+
+## 10. Accepted B/C integration (after independent worker review)
+
+The v1 frozen interface remains unchanged. `src/integration/slots.ts` now imports `scenes` from `src/content/scenes/index.ts` and `PracticeScreen` from `src/ui/PracticeScreen.tsx`; A still owns the complete locale/attempt/navigation/storage state. B original and repair commits, and C original and repair commits, are included through full-history Git merges. Any historical M1 text above referring to empty placeholders describes the pre-integration stage, not the current branch. All authored scenes remain provisional with no reviewed correctness classifications. See `docs/ACCEPTED_WORKER_INTEGRATION.md`.

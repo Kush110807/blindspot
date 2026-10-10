@@ -1,6 +1,6 @@
 # BlindSpot — asset and source credit ledger
 
-**Covers accepted M1 foundation and current A-owned integration assets.** Do not interpret this document as a license grant or a claim of reviewed rider training.
+**Covers accepted M1, A runtime and accepted B/C integration assets.** Do not interpret this document as a license grant or a claim of reviewed rider training.
 
 | Item | Used where | Origin and rights/status |
 | --- | --- | --- |
@@ -9,7 +9,7 @@
 | Text and headings | `src/App.tsx`, `index.html` | Authored foundation status copy and name/tagline from the submitted proposal. |
 | Fonts | foundation CSS | System/UI font stack; no downloaded or redistributed font files. |
 | Favicon SVG/ICO | `public/favicon.svg` / `public/favicon.ico`, referenced in `index.html` | Original vector markup and programmatically drawn raster icon prepared in this integration branch. No external logo, font, image or third-party asset used. Independent license/brand review pending. |
-| Scene images | `public/scenes/` | **None bundled yet.** A directory placeholder is not a functional learning asset. |
+| Scene images and post-lock overlay | `public/scenes/bus-training-01/`, `public/scenes/unfamiliar-blocked-01/`, `public/scenes/matched-clear-01/` | Four project-authored SVG files from accepted Chat B implementation and repair. See `docs/CONTENT_NOTES_B.md` for file-specific dimensions, origin, permitted usage, and provisional review status. |
 | Automated fixtures | `tests/fixture.ts` | Synthetic authored data for contract testing only, not instructor-reviewed scene content. |
 | Music, sound, datasets, video | — | None included. |
 
@@ -24,4 +24,4 @@
 
 Content Chat B must document **every new file** in `docs/CONTENT_NOTES_B.md` with: relative path, asset type, creator, date, original source URL/reference if external, license or usage permission, attribution obligations, native image dimensions, scene ID/version, region-overlay consistency, and whether the asset is a pre-lock image or a post-lock overlay. Do not use unlicensed external pictures or decorative proposal covers as verified road-scene maps.
 
-No reviewer approval, learner measurement or safety-effectiveness evidence is present at M0/M1.
+No qualified instructor approval, learner measurement or safety-effectiveness evidence is present at integration.
