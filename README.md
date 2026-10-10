@@ -70,3 +70,7 @@ A's `src/integration/slots.ts` connects B's `scenes` named export to C's `Practi
 - No GitHub remote, deployment or submission has been authorised. The final repository should exclude `node_modules/`, `dist/`, credentials, local records and personal identifiers.
 
 The proposal (`BlindSpot_Hackoverflow_Submission_Ready(1).pdf`) guided this scope but is not distributed in the repository. Additional sources and their non-validation status are recorded in the asset ledger. **No open-source project license is granted by this repository; decide repository visibility/license before publication.**
+
+## Result-review UX candidate (independent acceptance pending)
+
+The integrated application now leads locked review with a choice-specific takeaway, separate provisional recognition/response/reason comparisons, supported lesson alternatives, selected-versus-intended region overlays, and two response-linked bus-ending explanations. Review has expandable detail, retry creates a **new** attempt, and the clear-view final scene shows completion. No schema or saved-answer version changed; the same three authored SVG scenarios remain. This is a **review candidate**, not instructor validation or a finished safety assessment. See [result UX review notes](docs/RESULT_UX_REVIEW.md) for testing requirements and limitations.

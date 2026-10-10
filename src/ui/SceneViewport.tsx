@@ -10,11 +10,12 @@ interface SceneViewportProps {
   readonly selected: RegionSelection | null;
   readonly canSelect: boolean;
   readonly ending: Continuation | null;
+  readonly review: boolean;
   readonly onSelectRegion: (selection: RegionSelection) => void;
 }
 
 /** The frame uses the natural base-asset ratio; its images are never cropped. */
-export function SceneViewport({ scene, locale, selected, canSelect, ending, onSelectRegion }: SceneViewportProps) {
+export function SceneViewport({ scene, locale, selected, canSelect, ending, review, onSelectRegion }: SceneViewportProps) {
   function handleSceneClick(event: MouseEvent<HTMLDivElement>) {
     if (!canSelect) return;
     const frame = event.currentTarget.getBoundingClientRect();
@@ -42,6 +43,14 @@ export function SceneViewport({ scene, locale, selected, canSelect, ending, onSe
             style={{ left: `${region.bounds.x * 100}%`, top: `${region.bounds.y * 100}%`, width: `${region.bounds.width * 100}%`, height: `${region.bounds.height * 100}%` }}
           />
         ))}
+        {review && selected?.kind === 'region' && scene.tapRegions.filter(r => r.id === selected.regionId).map(r =>
+          <div key={`selected-${r.id}`} className="bs-review-area bs-review-area--selected" aria-hidden="true"
+            style={{ left: `${r.bounds.x * 100}%`, top: `${r.bounds.y * 100}%`, width: `${r.bounds.width * 100}%`, height: `${r.bounds.height * 100}%` }}><span>{locale === 'en' ? 'YOUR MARK' : 'आपका चयन'}</span></div>
+        )}
+        {review && scene.rubric.acceptedRegionIds.map(id => scene.tapRegions.find(r => r.id === id)).filter(r => r != null).map(r =>
+          <div key={`target-${r.id}`} className="bs-review-area bs-review-area--target" aria-hidden="true"
+            style={{ left: `${r.bounds.x * 100}%`, top: `${r.bounds.y * 100}%`, width: `${r.bounds.width * 100}%`, height: `${r.bounds.height * 100}%` }}><span>{locale === 'en' ? 'LESSON FOCUS' : 'पाठ का लक्ष्य'}</span></div>
+        )}
         {ending?.layers.map((layer) => (
           <img
             key={layer.id}

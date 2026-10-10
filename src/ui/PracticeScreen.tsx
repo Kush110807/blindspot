@@ -3,6 +3,7 @@ import type { Locale, Translated } from '../contracts/scene.ts';
 import { translate } from '../contracts/scene.ts';
 import { canLock } from '../engine/attempt.ts';
 import { SceneViewport } from './SceneViewport.tsx';
+import { buildLessonPresentation, type LessonDisposition } from '../integration/lessonPresentation.ts';
 import '../styles/practice.css';
 
 const copy: Record<Locale, Record<string, string>> = {
@@ -29,7 +30,28 @@ const copy: Record<Locale, Record<string, string>> = {
     endingNotice: 'Both endings start from the same initial conditions. Neither is proof of a validated safety outcome.',
     noExplanation: 'Review text is not available for this attempt.',
     lockedTag: 'SUBMITTED', reviewedTag: 'REVIEW MODE', regionHelp: 'Every outlined location is a neutral selection option, not a correctness hint.',
-    nextUnavailable: 'Next scene is not available yet',
+    nextUnavailable: 'See both endings before continuing',
+    supported: 'Supported in this draft', conditional: 'Depends on conditions', reconsider: 'Revisit this choice',
+    draftComparison: 'Provisional lesson comparison — not an instructor-validated score',
+    keyTakeaway: 'Your decision, explained', yourChoice: 'Your choice', itsMeaning: 'What it means in this scene',
+    change: 'What to do differently', whyBetter: 'Why this addresses the visibility question',
+    alternatives: 'Draft-supported alternatives', details: 'Read the detailed explanation',
+    observationLabel: 'Recognition', responseLabel: 'Response', reasoningLabel: 'Reasoning',
+    regionCompare: 'Your marked area vs lesson focus', markedArea: 'Your selected area', focusArea: 'Lesson’s intended area',
+    clearNone: 'No target obstruction is present here. Keep observing the road for other hazards.',
+    tryAgain: 'Try this scene again', complete: 'All three scenes completed', completionHelp: 'Your answers are saved locally when storage is available. These are practice comparisons, not validated scores.',
+    outcomeLink: 'What this ending means for your response',
+    continuationDetails: 'Why the outcome does not change the initial decision',
+    responseDetails: 'Full response explanation',
+    recognitionMatches: 'Your mark matches the lesson’s intended visibility focus.',
+    recognitionDiffers: 'Compare your mark with the highlighted lesson area.',
+    responseMatches: 'This action fits one of the draft-supported approaches.',
+    responseDepends: 'This action requires additional checks not shown here.',
+    responseDiffers: 'This action leaves the scene’s key concern unresolved.',
+    reasonMatches: 'Your reason addresses the concern in the initial view.',
+    reasonDiffers: 'Your reason overlooks something in the initial view.',
+    noChange: 'This draft does not ask you to replace that basic response. Keep adapting to the conditions as you approach.',
+    nextScene: 'Continue to next scene', seenBoth: 'View both endings to continue',
   },
   hi: {
     brandSub: 'जो दिखाई नहीं देता, उसे समझें', training: 'निर्देशित अभ्यास', assessment: 'स्वतंत्र अभ्यास',
@@ -54,7 +76,28 @@ const copy: Record<Locale, Record<string, string>> = {
     endingNotice: 'दोनों परिणाम एक जैसी शुरुआती स्थिति से शुरू होते हैं। इन्हें प्रमाणित सुरक्षा परिणाम न समझें।',
     noExplanation: 'इस प्रयास की समीक्षा उपलब्ध नहीं है।',
     lockedTag: 'जमा हुआ', reviewedTag: 'समीक्षा मोड', regionHelp: 'चिह्नित क्षेत्र केवल तटस्थ विकल्प हैं, सही उत्तर का संकेत नहीं।',
-    nextUnavailable: 'अभी अगला दृश्य उपलब्ध नहीं है',
+    nextUnavailable: 'आगे बढ़ने से पहले दोनों अंत देखें',
+    supported: 'इस मसौदे में समर्थित', conditional: 'परिस्थितियों पर निर्भर', reconsider: 'दोबारा विचार करें',
+    draftComparison: 'प्रारंभिक पाठ से तुलना — प्रशिक्षक द्वारा प्रमाणित स्कोर नहीं',
+    keyTakeaway: 'आपके निर्णय का अर्थ', yourChoice: 'आपकी पसंद', itsMeaning: 'इस दृश्य में इसका मतलब',
+    change: 'अगली बार क्या बदलें', whyBetter: 'यह दृश्य की समस्या को क्यों समझता है',
+    alternatives: 'प्रारंभिक पाठ के समर्थित विकल्प', details: 'पूरा स्पष्टीकरण पढ़ें',
+    observationLabel: 'पहचान', responseLabel: 'कदम', reasoningLabel: 'कारण',
+    regionCompare: 'आपकी चुनी जगह और पाठ का लक्ष्य', markedArea: 'आपकी चुनी जगह', focusArea: 'पाठ का लक्षित हिस्सा',
+    clearNone: 'यहाँ लक्षित रुकावट नहीं है। सड़क के अन्य संभावित जोखिमों पर नज़र रखें।',
+    tryAgain: 'इस दृश्य को फिर आज़माएँ', complete: 'तीनों दृश्य पूरे हो गए', completionHelp: 'स्टोरेज उपलब्ध होने पर उत्तर आपके डिवाइस में सहेजे जाते हैं। ये अभ्यास की तुलनाएँ हैं, प्रमाणित स्कोर नहीं।',
+    outcomeLink: 'आपके कदम के संदर्भ में इस अंत का मतलब',
+    continuationDetails: 'अंत बदलने से शुरुआती निर्णय का आधार क्यों नहीं बदलता',
+    responseDetails: 'कदम का पूरा स्पष्टीकरण',
+    recognitionMatches: 'आपका चुना हिस्सा पाठ के लक्षित दृश्य से मेल खाता है।',
+    recognitionDiffers: 'अपनी चुनी जगह की तुलना पाठ में चिह्नित हिस्से से करें।',
+    responseMatches: 'यह कदम मसौदे के समर्थित विकल्पों में से एक है।',
+    responseDepends: 'इस कदम के लिए ऐसी अतिरिक्त जाँच ज़रूरी है जो यहाँ नहीं दिखाई गई।',
+    responseDiffers: 'यह कदम दृश्य की मुख्य अनिश्चितता दूर नहीं करता।',
+    reasonMatches: 'आपका कारण शुरुआती दृश्य के सवाल पर ध्यान देता है।',
+    reasonDiffers: 'आपका कारण शुरुआती दृश्य की एक ज़रूरी बात छोड़ता है।',
+    noChange: 'यह मसौदा आपके मूल कदम को बदलने के लिए नहीं कहता। पास पहुँचते समय बदलती स्थिति देखते रहें।',
+    nextScene: 'अगले दृश्य पर जाएँ', seenBoth: 'आगे जाने से पहले दोनों अंत देखें',
   },
 };
 
@@ -106,9 +149,17 @@ export function PracticeScreen(props: PracticeScreenProps) {
   const allTrainingEndingsSeen = scene.purpose !== 'training' ||
     attempt.endingIndex >= scene.continuations.length - 1;
   const canContinue = canNextScene && allTrainingEndingsSeen;
+  const lesson = canReview ? buildLessonPresentation(scene, submitted, locale, currentEnding?.id ?? null) : null;
+  const statusText = (status: LessonDisposition) => status === 'supported' ? t.supported : status === 'conditional' ? t.conditional : t.reconsider;
+  const compactCriterion = (criterion: 'recognition' | 'response' | 'reason') => {
+    if (!lesson) return '';
+    if (criterion === 'recognition') return lesson.recognition === 'supported' ? t.recognitionMatches : t.recognitionDiffers;
+    if (criterion === 'reason') return lesson.reason === 'supported' ? t.reasonMatches : t.reasonDiffers;
+    return lesson.response === 'supported' ? t.responseMatches : lesson.response === 'conditional' ? t.responseDepends : t.responseDiffers;
+  };
 
   return (
-    <div className="bs-app" lang={locale}>
+    <div className={`bs-app${canReview ? ' bs-app--review' : ''}`} lang={locale}>
       <div className="bs-ambient bs-ambient--one" aria-hidden="true" />
       <div className="bs-ambient bs-ambient--two" aria-hidden="true" />
       <header className="bs-topbar">
@@ -142,17 +193,29 @@ export function PracticeScreen(props: PracticeScreenProps) {
           <div className="bs-intro-text">
             <span className="bs-kicker"><span className="bs-kicker-line" /> {t.module} <span className="bs-kicker-divider">/</span> {scene.purpose === 'training' ? t.training : t.assessment}</span>
             <h1>{tr(scene.title, locale)}</h1>
-            <p>{tr(scene.prompt, locale)}</p>
+            <p>{canReview ? t.reviewHint : tr(scene.prompt, locale)}</p>
           </div>
           <span className="bs-status-badge"><span />{isReview ? t.reviewedTag : isLocked ? t.lockedTag : scene.purpose === 'training' ? t.training : t.assessment}</span>
         </div>
 
+        {canReview && lesson && <section className="bs-review-lead" aria-label={t.keyTakeaway}>
+          <p className="bs-review-eyebrow">{t.draftComparison}</p>
+          <h2>{t.keyTakeaway}</h2>
+          <p className="bs-review-takeaway" data-testid="review-takeaway">{lesson.takeaway}</p>
+        </section>}
         <div className="bs-workspace">
           <section className="bs-scene-panel" aria-label={t.visual}>
             <div className="bs-panel-head"><span className="bs-panel-kicker"><span className="bs-panel-dot" /> {t.visual}</span><span className="bs-panel-subtle">{currentEnding ? t.continuation : t.original}</span></div>
             <SceneViewport scene={scene} locale={locale} selected={attempt.regionSelection} canSelect={isAnswering}
-              ending={currentEnding} onSelectRegion={onSelectRegion} />
+              ending={currentEnding} review={canReview} onSelectRegion={onSelectRegion} />
             {isAnswering && <p className="bs-map-caption"><span aria-hidden="true">◎</span> {t.regionHelp}</p>}
+            {canReview && lesson && <div className="bs-region-comparison" data-testid="region-comparison">
+              <h3>{t.regionCompare}</h3>
+              <dl><div><dt><span className="bs-marked-dot" />{t.markedArea}</dt><dd>{lesson.selectedRegion}</dd></div>
+              <div><dt><span className="bs-target-dot" />{t.focusArea}</dt><dd>{lesson.expectedRegion}</dd></div></dl>
+              <p>{lesson.regionExplanation}</p>
+              {scene.condition === 'clear-view-control' && <p className="bs-clear-note">{t.clearNone}</p>}
+            </div>}
             <div className="bs-conditions">
               <div className="bs-conditions-head"><span className="bs-list-index">01</span><h2>{t.visible}</h2></div>
               <ul>{scene.visibleConditions.map((condition, index) => <li key={index}><span className="bs-condition-bullet" />{tr(condition, locale)}</li>)}</ul>
@@ -164,7 +227,7 @@ export function PracticeScreen(props: PracticeScreenProps) {
               <div className="bs-action-overline"><span className="bs-small-square" /> 01 / {t.observe}</div>
               <h2>{t.observeTitle}</h2>
               <p className="bs-action-description">{t.observeBody}</p>
-              <div className="bs-observe-card" aria-hidden="true"><span className="bs-observe-eye">◎</span><span className="bs-observe-grid" /></div>
+
               <div className="bs-panel-footer"><button type="button" className="bs-primary" onClick={onBegin}>{t.start}<span aria-hidden="true">↗</span></button></div>
             </>}
 
@@ -214,30 +277,51 @@ export function PracticeScreen(props: PracticeScreenProps) {
 
             {isReview && <>
               <div className="bs-action-overline"><span className="bs-small-square" /> 03 / {t.review}</div>
-              <h2>{t.reviewTitle}</h2><p className="bs-action-description">{t.reviewHint}</p>
-              {canReview && submitted && <section className="bs-summary bs-summary--review" aria-label={t.confirmed}>
-                <h3>{t.confirmed}</h3>
-                <dl className="bs-submitted-list">{submittedChoices.map(({ label, value }) =>
-                  <div className="bs-submitted-item" key={label}><dt>{label}</dt><dd>{value}</dd></div>
-                )}</dl>
-              </section>}
-              {canReview && feedback ? <div className="bs-feedback">
-                <article><span className="bs-feedback-number">01</span><div><h3>{t.recognition}</h3><p>{feedback.recognition}</p></div></article>
-                <article><span className="bs-feedback-number">02</span><div><h3>{t.responseNote}</h3><p>{feedback.response}</p></div></article>
-                <article><span className="bs-feedback-number">03</span><div><h3>{t.reasonNote}</h3><p>{feedback.reason}</p></div></article>
-              </div> : <p className="bs-action-description">{t.noExplanation}</p>}
-              {canReview && currentEnding ? <div className="bs-ending-card">
+              {canReview && lesson && submitted && feedback ? <>
+                <section className="bs-review-choices" aria-label={t.yourChoice}>
+                  <h2>{t.yourChoice}</h2>
+                  <dl className="bs-submitted-list">{submittedChoices.map(({ label, value }) =>
+                    <div className="bs-submitted-item" key={label}><dt>{label}</dt><dd>{value}</dd></div>
+                  )}</dl>
+                </section>
+                <section className="bs-criteria" aria-label={t.reviewTitle}>
+                  <h2>{t.reviewTitle}</h2>
+                  {([['recognition', t.observationLabel],
+                     ['response', t.responseLabel],
+                     ['reason', t.reasoningLabel]] as const).map(([criterion, name]) =>
+                    <article key={criterion} data-testid={`criterion-${criterion}`}>
+                      <div className="bs-criterion-heading"><h3>{name}</h3><span className={`bs-criterion-status bs-criterion-status--${lesson[criterion]}`}>{statusText(lesson[criterion])}</span></div>
+                      <p>{compactCriterion(criterion)}</p>
+                    </article>
+                  )}
+                </section>
+                <section className="bs-change-section" aria-label={t.change}>
+                  <h2>{t.itsMeaning}</h2><p>{lesson.responseMeaning}</p>
+                  <h2>{t.change}</h2><p>{lesson.response === 'supported' ? t.noChange : lesson.nextStep}</p>
+                  <h3>{t.alternatives}</h3><ul>{lesson.alternatives.map((a) => <li key={a}>{a}</li>)}</ul>
+                  <h2>{t.whyBetter}</h2><p>{lesson.why}</p>
+                  <details className="bs-expand"><summary>{t.details}</summary>
+                    <p><strong>{t.observationLabel}:</strong> {feedback.recognition}</p>
+                    <p><strong>{t.responseLabel}:</strong> {feedback.response}</p>
+                    <p><strong>{t.reasoningLabel}:</strong> {feedback.reason}</p>
+                  </details>
+                </section>
+              </> : <p className="bs-action-description">{t.noExplanation}</p>}
+              {canReview && currentEnding && <section className="bs-ending-card" data-testid="ending-review">
                 <span className="bs-ending-label">{t.ended} · {attempt.endingIndex + 1} / {scene.continuations.length}</span>
-                <h3>{tr(currentEnding.title, locale)}</h3><p>{tr(currentEnding.narrative, locale)}</p>
-                <p className="bs-ending-note">{t.endingNotice}</p>
+                <h3>{tr(currentEnding.title, locale)}</h3>
+                {lesson?.endingMessage && <div className="bs-ending-takeaway"><strong>{t.outcomeLink}</strong><p>{lesson.endingMessage}</p></div>}
+                <details className="bs-expand"><summary>{t.continuationDetails}</summary><p>{tr(currentEnding.narrative, locale)}</p><p>{t.endingNotice}</p></details>
                 {attempt.endingIndex < scene.continuations.length - 1 ?
                   <button type="button" className="bs-secondary bs-full" onClick={onNextEnding}>{t.nextEnding}<span aria-hidden="true">→</span></button> :
                   <button type="button" className="bs-secondary bs-full" onClick={onReplayEndings}>{t.replay}<span aria-hidden="true">↺</span></button>}
-              </div> : scene.purpose === 'assessment' && <p className="bs-assessment-note">{t.assessmentReview}</p>}
-              {(scene.contentReview.status === 'provisional' || feedback?.provisional) &&
-                <div className="bs-provisional"><span aria-hidden="true">ⓘ</span><span>{t.draft}</span></div>}
-              <div className="bs-panel-footer bs-panel-footer--review"><button type="button" className="bs-secondary" onClick={onRestart}>{t.startNew}<span aria-hidden="true">↺</span></button>
-                <button type="button" className="bs-primary" disabled={!canContinue} onClick={onNextScene} title={!canContinue ? t.nextUnavailable : undefined}>{t.next}<span aria-hidden="true">→</span></button></div>
+              </section>}
+              {scene.purpose === 'assessment' && <p className="bs-assessment-note">{t.assessmentReview}</p>}
+              <div className="bs-provisional"><span aria-hidden="true">ⓘ</span><span>{t.draft}</span></div>
+              {canContinue && <button type="button" className="bs-primary bs-next-action" onClick={onNextScene}>{t.nextScene}<span aria-hidden="true">→</span></button>}
+              {scene.condition === 'clear-view-control' && !canNextScene && <section className="bs-completed" data-testid="practice-completed"><h2>{t.complete}</h2><p>{t.completionHelp}</p></section>}
+              {canNextScene && !allTrainingEndingsSeen && <p className="bs-next-hint">{t.seenBoth}</p>}
+              <button type="button" className="bs-secondary bs-retry-action" onClick={onRestart}>{t.tryAgain}<span aria-hidden="true">↺</span></button>
             </>}
           </section>
         </div>
