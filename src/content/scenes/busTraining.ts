@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Authored example only: initial evidence is identical in both continuations. */
 export const busTrainingScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.0.1-provisional',
+  sceneVersion: '1.1.0-provisional',
   id: 'bus-training-01',
   purpose: 'training',
   condition: 'blocked-view',
@@ -26,12 +26,12 @@ export const busTrainingScene: SceneDefinition = {
     },
   ],
   base: {
-    src: '/scenes/bus-training-01/base.svg',
-    width: 1280,
-    height: 720,
+    src: '/scenes/bus-training-01/base.png',
+    width: 1672,
+    height: 941,
     alt: {
-      en: 'Illustrated rider-eye road view: a large parked bus on the left, an approaching vehicle in the opposite lane, and the far roadside partly screened by the bus. No pedestrian is visible.',
-      hi: 'राइडर की नज़र से बनी सड़क की तस्वीर: बाईं ओर एक बड़ी खड़ी बस, विपरीत लेन में आती गाड़ी और बस के आगे आंशिक रूप से छिपा सड़क किनारा। कोई पैदल यात्री दिखाई नहीं दे रहा।',
+      en: 'Semi-realistic rider-eye street view: a parked red-and-white bus on the left screens the pavement beyond its front, and a white SUV approaches in the opposite lane. No pedestrian is initially visible.',
+      hi: 'राइडर की नज़र से सड़क का वास्तविकता के करीब दृश्य: बाईं ओर लाल-सफेद खड़ी बस अपने अगले सिरे के आगे का फुटपाथ छिपाती है और विपरीत लेन में सफेद एसयूवी आती दिखती है। शुरुआत में कोई पैदल यात्री दिखाई नहीं देता।',
     },
   },
   tapRegions: [
@@ -41,22 +41,22 @@ export const busTrainingScene: SceneDefinition = {
         en: 'Space beside and beyond the far edge of the bus',
         hi: 'बस के अगले किनारे के पास और उसके आगे की जगह',
       },
-      bounds: { x: 0.48, y: 0.39, width: 0.13, height: 0.29 },
+      bounds: { x: 0.445, y: 0.305, width: 0.11, height: 0.255 },
     },
     {
       id: 'lane-directly-ahead',
       label: { en: 'Lane directly ahead', hi: 'सीधे सामने की लेन' },
-      bounds: { x: 0.43, y: 0.71, width: 0.16, height: 0.13 },
+      bounds: { x: 0.47, y: 0.63, width: 0.13, height: 0.14 },
     },
     {
       id: 'opposite-lane-vehicle',
       label: { en: 'Vehicle in the opposite lane', hi: 'विपरीत लेन की गाड़ी' },
-      bounds: { x: 0.72, y: 0.49, width: 0.14, height: 0.23 },
+      bounds: { x: 0.60, y: 0.31, width: 0.14, height: 0.18 },
     },
     {
       id: 'near-left-pavement',
       label: { en: 'Near-left pavement', hi: 'बाईं ओर पास का फुटपाथ' },
-      bounds: { x: 0.03, y: 0.54, width: 0.15, height: 0.27 },
+      bounds: { x: 0.01, y: 0.50, width: 0.20, height: 0.15 },
     },
   ],
   responseOptions: [
@@ -141,15 +141,15 @@ export const busTrainingScene: SceneDefinition = {
         {
           id: 'pedestrian-at-bus-edge',
           image: {
-            src: '/scenes/bus-training-01/pedestrian-emerges.svg',
-            width: 180,
-            height: 270,
+            src: '/scenes/bus-training-01/pedestrian-emerges.png',
+            width: 1672,
+            height: 941,
             alt: {
-              en: 'Non-graphic illustrated pedestrian walking out beside the bus, shown only after the answer is locked.',
-              hi: 'बस के पास से निकलता एक चित्रित पैदल यात्री, जो उत्तर लॉक होने के बाद ही दिखता है; कोई दुर्घटना नहीं दिखाई गई है।',
+              en: 'Pedestrian walking from beyond the front of the bus toward the rider’s path; visible only in the locked second ending.',
+              hi: 'बस के अगले सिरे के आगे से राइडर के संभावित रास्ते की ओर आता पैदल यात्री, जो उत्तर लॉक होने के बाद दूसरे अंत में ही दिखता है; कोई टक्कर नहीं दिखाई गई है।',
             },
           },
-          bounds: { x: 0.495, y: 0.425, width: 0.14, height: 0.375 },
+          bounds: { x: 0, y: 0, width: 1, height: 1 },
         },
       ],
     },

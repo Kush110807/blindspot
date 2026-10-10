@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Matched composition to unfamiliar-blocked-01, without the stationary van. */
 export const matchedClearScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.0.1-provisional',
+  sceneVersion: '1.1.0-provisional',
   id: 'matched-clear-01',
   purpose: 'assessment',
   condition: 'clear-view-control',
@@ -23,34 +23,34 @@ export const matchedClearScene: SceneDefinition = {
     },
   ],
   base: {
-    src: '/scenes/matched-clear-01/base.svg',
-    width: 1280,
-    height: 720,
+    src: '/scenes/matched-clear-01/base.png',
+    width: 1672,
+    height: 941,
     alt: {
-      en: 'Illustrated rider-eye view approaching a side-street entrance on the right, with a small vehicle farther ahead on the left and road space near the entrance visible.',
-      hi: 'राइडर की नज़र से बना चित्र: दाईं ओर जोड़ने वाली सड़क का प्रवेश, बाईं ओर कुछ दूरी पर एक छोटी गाड़ी और प्रवेश के पास दिखाई देती सड़क की जगह।',
+      en: 'Semi-realistic rider-eye view of a visible side-street junction to the right with its full approach open; farther traffic appears on the left. Same road and camera as the blocked image, minus the van and shadow.',
+      hi: 'राइडर की नज़र से वास्तविकता के करीब दृश्य: दाईं ओर जोड़ने वाली सड़क का प्रवेश और उसके पास का रास्ता खुला दिखता है; बाईं ओर आगे ट्रैफ़िक है। कैमरा और सड़क वैन वाले दृश्य जैसे ही हैं, बस वैन और उसकी छाया नहीं हैं।',
     },
   },
   tapRegions: [
     {
       id: 'open-right-entry',
       label: { en: 'Area at the right-hand side-street entrance', hi: 'दाईं ओर की जोड़ने वाली सड़क का प्रवेश' },
-      bounds: { x: 0.555, y: 0.40, width: 0.16, height: 0.27 },
+      bounds: { x: 0.77, y: 0.27, width: 0.17, height: 0.25 },
     },
     {
       id: 'far-left-vehicle',
       label: { en: 'Vehicle farther ahead on the left', hi: 'बाईं ओर आगे की गाड़ी' },
-      bounds: { x: 0.26, y: 0.53, width: 0.15, height: 0.17 },
+      bounds: { x: 0.225, y: 0.265, width: 0.095, height: 0.14 },
     },
     {
       id: 'near-lane-surface',
       label: { en: 'Near section of your lane', hi: 'अपनी लेन का नज़दीकी हिस्सा' },
-      bounds: { x: 0.40, y: 0.73, width: 0.17, height: 0.12 },
+      bounds: { x: 0.38, y: 0.61, width: 0.18, height: 0.13 },
     },
     {
       id: 'right-side-pavement',
       label: { en: 'Pavement beyond the right curb', hi: 'दाएँ किनारे के आगे का फुटपाथ' },
-      bounds: { x: 0.87, y: 0.60, width: 0.12, height: 0.23 },
+      bounds: { x: 0.90, y: 0.50, width: 0.09, height: 0.14 },
     },
   ],
   responseOptions: [

@@ -9,7 +9,7 @@
 | Text and headings | `src/App.tsx`, `index.html` | Authored foundation status copy and name/tagline from the submitted proposal. |
 | Fonts | foundation CSS | System/UI font stack; no downloaded or redistributed font files. |
 | Favicon SVG/ICO | `public/favicon.svg` / `public/favicon.ico`, referenced in `index.html` | Original vector markup and programmatically drawn raster icon prepared in this integration branch. No external logo, font, image or third-party asset used. Independent license/brand review pending. |
-| Scene images and post-lock overlay | `public/scenes/bus-training-01/`, `public/scenes/unfamiliar-blocked-01/`, `public/scenes/matched-clear-01/` | Four project-authored SVG files from accepted Chat B implementation and repair. See `docs/CONTENT_NOTES_B.md` for file-specific dimensions, origin, permitted usage, and provisional review status. |
+| Scene images and post-lock overlay | `public/scenes/bus-training-01/`, `public/scenes/unfamiliar-blocked-01/`, `public/scenes/matched-clear-01/` | Originally project-authored SVGs during accepted B content phase; replaced for this artwork candidate by AI-generated raster bus base, transparent pedestrian overlay, fixed clear assessment background, derived white-van cutout and shadow, and exact blocked-view composite. See `docs/ARTWORK_LAYERED_INTEGRATION.md` for full provenance, alpha-composite verification, scene versions and provisional review status. |
 | Automated fixtures | `tests/fixture.ts` | Synthetic authored data for contract testing only, not instructor-reviewed scene content. |
 | Music, sound, datasets, video | — | None included. |
 

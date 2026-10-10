@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Unfamiliar layout for a later, unscored blocked-view practice assessment. */
 export const unfamiliarBlockedScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.0.1-provisional',
+  sceneVersion: '1.1.0-provisional',
   id: 'unfamiliar-blocked-01',
   purpose: 'assessment',
   condition: 'blocked-view',
@@ -23,37 +23,37 @@ export const unfamiliarBlockedScene: SceneDefinition = {
     },
   ],
   base: {
-    src: '/scenes/unfamiliar-blocked-01/base.svg',
-    width: 1280,
-    height: 720,
+    src: '/scenes/unfamiliar-blocked-01/base.png',
+    width: 1672,
+    height: 941,
     alt: {
-      en: 'Rider-eye illustration of a street with a side-street entrance to the right, a large stationary delivery van near the entrance, and another small vehicle farther ahead on the left. No person is shown emerging.',
-      hi: 'राइडर की नज़र से सड़क का चित्र: दाईं ओर जोड़ने वाली सड़क का प्रवेश, उसके पास खड़ी बड़ी डिलीवरी वैन और बाईं ओर कुछ दूर एक छोटी गाड़ी। कोई व्यक्ति निकलता नहीं दिखाया गया है।',
+      en: 'Semi-realistic rider-eye view: a white delivery van partly screens the right-hand side-road approach while its junction mouth and approaching lane remain identifiable; traffic is farther ahead on the left.',
+      hi: 'राइडर की नज़र से वास्तविकता के करीब दृश्य: सफेद डिलीवरी वैन दाईं ओर की जोड़ने वाली सड़क का कुछ हिस्सा छिपाती है, पर प्रवेश और मुख्य लेन दिखते हैं; बाईं ओर आगे ट्रैफ़िक मौजूद है।',
     },
   },
   tapRegions: [
     {
       id: 'beside-delivery-van',
       label: {
-        en: 'Area beside the left edge of the delivery van',
-        hi: 'डिलीवरी वैन के बाएँ किनारे के पास की जगह',
+        en: 'Side-road approach partly screened past the front-left edge of the delivery van',
+        hi: 'डिलीवरी वैन के बाएँ अगले किनारे से आंशिक रूप से छिपा बगल की सड़क का हिस्सा',
       },
-      bounds: { x: 0.555, y: 0.40, width: 0.16, height: 0.27 },
+      bounds: { x: 0.635, y: 0.30, width: 0.13, height: 0.23 },
     },
     {
       id: 'far-left-vehicle',
       label: { en: 'Vehicle farther ahead on the left', hi: 'बाईं ओर आगे की गाड़ी' },
-      bounds: { x: 0.26, y: 0.53, width: 0.15, height: 0.17 },
+      bounds: { x: 0.225, y: 0.265, width: 0.095, height: 0.14 },
     },
     {
       id: 'near-lane-surface',
       label: { en: 'Near section of your lane', hi: 'अपनी लेन का नज़दीकी हिस्सा' },
-      bounds: { x: 0.40, y: 0.73, width: 0.17, height: 0.12 },
+      bounds: { x: 0.38, y: 0.61, width: 0.18, height: 0.13 },
     },
     {
       id: 'right-side-pavement',
       label: { en: 'Pavement beyond the right curb', hi: 'दाएँ किनारे के आगे का फुटपाथ' },
-      bounds: { x: 0.87, y: 0.60, width: 0.12, height: 0.23 },
+      bounds: { x: 0.90, y: 0.50, width: 0.09, height: 0.14 },
     },
   ],
   responseOptions: [

@@ -28,7 +28,7 @@ function answerAndLock(state: PracticeSession, selection: 'none' | 'region' = 'r
   return state;
 }
 
-test('accepted B source catalogue is exact, provisional and references actual bundled SVG assets', () => {
+test('accepted scene catalogue remains provisional and references bundled raster assets', () => {
   assert.equal(scenes.length, 3);
   assert.deepEqual(catalogueErrors(scenes), []);
   for (const scene of scenes) {
@@ -37,7 +37,10 @@ test('accepted B source catalogue is exact, provisional and references actual bu
     assert.equal(scene.base.src.startsWith('/scenes/'), true);
     for (const asset of [scene.base, ...scene.continuations.flatMap(c => c.layers.map(l => l.image))]) {
       assert.ok(existsSync(`public${asset.src}`), `missing image ${asset.src}`);
-      assert.match(readFileSync(`public${asset.src}`, 'utf8'), /<svg\b/);
+      const png = readFileSync(`public${asset.src}`);
+      assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+      assert.equal(png.readUInt32BE(16), asset.width);
+      assert.equal(png.readUInt32BE(20), asset.height);
       for (const locale of ['en', 'hi'] as const) assert.ok(translate(asset.alt, locale).trim());
     }
     for (const locale of ['en', 'hi'] as const) {

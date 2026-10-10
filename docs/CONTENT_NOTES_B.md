@@ -111,3 +111,7 @@ npm run build
 ```
 
 The complete, executed outcome and any blocked checks are reported separately in the B handoff. There are no new files under `tests/`; A can later add formal content regression tests during integration.
+
+## Superseding artwork review (A integration, 1.1.0-provisional)
+
+The historical SVG file/region tables above document accepted B version 1.0.1 only. They **do not** describe the current running-artwork candidates. The image evidence now uses layered 1672 × 941 raster assets with new normalized regions and descriptions. For exact file paths, provenance and checks, refer to `docs/ARTWORK_LAYERED_INTEGRATION.md`. Semantic IDs and provisional lesson decisions are unchanged; `schemaVersion` is 1, and all three `sceneVersion` values are `1.1.0-provisional`. No instructor review has been conducted.

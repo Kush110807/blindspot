@@ -2,7 +2,7 @@
 
 **Practice decisions when the road ahead is hidden.**
 
-BlindSpot is a **three-scene, phone-friendly React + TypeScript prototype** for practising observation and decision reasoning when the view of the road is blocked. It is intended for adult novice two-wheeler riders. This is a fictional illustrated learning exercise, **not a riding simulator, validated safety intervention or replacement for qualified instruction**.
+BlindSpot is a **three-scene, phone-friendly React + TypeScript prototype** for practising observation and decision reasoning when the view of the road is blocked. It is intended for adult novice two-wheeler riders. This is a authored illustrated learning exercise, **not a riding simulator, validated safety intervention or replacement for qualified instruction**.
 
 **Integration status:** This branch combines the accepted A runtime (`1d711b14f96eaea9e3b311c10b260abe9ac2d08f`), B original scene implementation plus accepted content repair (`e0c6a0f` → `bcd0b5d`), and C original interface implementation plus accepted repair (`ac5e803` → `42175db`). Both worker histories remain in Git. The integrated candidate awaits independent acceptance. Nothing has been published or submitted.
 
@@ -40,7 +40,7 @@ Visit Vite's local URL, normally `http://localhost:5173/`. For a production smok
 
 ### Actual verification scope
 
-The integration environment independently passes Node's 34 integration+contract tests and validates the authored SVG files. It **cannot complete `npm ci`** because the registry is unreachable and required package tarballs are not cached (notably Vite 6.4.4). Consequently the integrated React full typecheck/build **cannot be verified in this environment**. The previous Windows evidence showed a passing build of the **M1 foundation**, not this combined application. Desktop and 375px browser rendering, including accessibility and localStorage cases, must be performed on a machine where `npm ci` succeeds before integration acceptance. See `docs/ACCEPTED_WORKER_INTEGRATION.md` for the actual command results and outstanding UI verification steps. Do not treat this source-only integration as a finished release.
+This artwork revision independently passes 53 contract, runtime and scene integration tests, including raster-asset checks, plus an exact pixel-layer invariant check. It **cannot complete `npm ci`** because the registry is unreachable and required package tarballs are not cached (notably Vite 6.4.4). Consequently the integrated React full typecheck/build **cannot be verified in this environment**. The previous Windows evidence showed a passing build of the **M1 foundation**, not this combined application. Desktop and 375px browser rendering, including accessibility and localStorage cases, must be performed on a machine where `npm ci` succeeds before integration acceptance. See `docs/ACCEPTED_WORKER_INTEGRATION.md` for the actual command results and outstanding UI verification steps. Do not treat this source-only integration as a finished release.
 
 ## Included scenes and functionality
 
@@ -62,7 +62,7 @@ A's `src/integration/slots.ts` connects B's `scenes` named export to C's `Practi
 
 ## Assets, privacy and limitations
 
-- Three vector base scenes and one pedestrian continuation overlay are bundled under `public/scenes/`, originally authored for this project. See `docs/CONTENT_NOTES_B.md` and `docs/ASSET_CREDITS.md` for creator/provenance and review status.
+- Three full-resolution raster base scenes and the transparent pedestrian/van layers are bundled under `public/scenes/`. The blocked assessment is exactly the clear scene plus a transparent van/shadow layer, with no modified pixels outside the layer. See `docs/ARTWORK_LAYERED_INTEGRATION.md` and `docs/ASSET_CREDITS.md` for provenance and review status.
 - Brand/favicon are original vector/CSS work; no external fonts, stock photos, soundtrack, personal data, or private credentials are included. React and Vite retain their own package licenses.
 - All scene conditions and feedback are provisional; screenshots or programming tests do **not** constitute instructor validation or evidence of real-world safety benefit.
 - Corrupt local storage is retained without automatic replacement; a failed save means in-memory attempts may be lost after refresh. The local browser cannot guarantee secure storage.
@@ -73,4 +73,8 @@ The proposal (`BlindSpot_Hackoverflow_Submission_Ready(1).pdf`) guided this scop
 
 ## Result-review UX candidate (independent acceptance pending)
 
-The integrated application now leads locked review with a choice-specific takeaway, separate provisional recognition/response/reason comparisons, supported lesson alternatives, selected-versus-intended region overlays, and two response-linked bus-ending explanations. Review has expandable detail, retry creates a **new** attempt, and the clear-view final scene shows completion. No schema or saved-answer version changed; the same three authored SVG scenarios remain. This is a **review candidate**, not instructor validation or a finished safety assessment. See [result UX review notes](docs/RESULT_UX_REVIEW.md) for testing requirements and limitations.
+The integrated application now leads locked review with a choice-specific takeaway, separate provisional recognition/response/reason comparisons, supported lesson alternatives, selected-versus-intended region overlays, and two response-linked bus-ending explanations. Review has expandable detail, retry creates a **new** attempt, and the clear-view final scene shows completion. No schema or saved-answer version changed; the same three authored scenarios remain with raster assets and bumped scene versions (`1.1.0-provisional`). This is a **review candidate**, not instructor validation or a finished safety assessment. See [result UX review notes](docs/RESULT_UX_REVIEW.md) for testing requirements and limitations.
+
+## Layered artwork review (independent acceptance pending)
+
+The bus base and pedestrian are frozen after artwork approval; the pedestrian remains a post-lock overlay. The clear assessment street is the unaltered pixel background for the blocked view; only the separately stored van/shadow overlay changes the blocked image. `schemaVersion` remains 1 and scene IDs/response IDs/reason IDs are stable; all three `sceneVersion` values are now `1.1.0-provisional` to prevent reuse of older image evidence. See `docs/ARTWORK_LAYERED_INTEGRATION.md` and run `python scripts/verify-artwork.py` with Pillow and NumPy installed for strict pixel comparison. The real React/Vite rendering has **not** been verified in this environment while npm dependencies are unavailable.
