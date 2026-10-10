@@ -6,15 +6,17 @@
 - [x] GitHub-quality README documents commands, scope, limitations, review and asset credit.
 - [x] Tracked-files exclusion rules cover dependencies/build outputs, credentials and local records.
 - [x] Foundation status page and contract tests exist.
-- [ ] **Genuine npm-generated `package-lock.json` committed.** npm registry not reachable from authoring sandbox (`EAI_AGAIN`).
+- [ ] **Genuine npm-generated `package-lock.json` committed.** npm registry not reachable from Node 22.16.0/npm 10.9.2 repair sandbox (`EAI_AGAIN`).
 - [ ] **Fresh `npm ci`, `npm run check`, `npm run verify:repo` passes on a network-capable machine.**
-- [ ] Real browser confirmation of mounting, responsive layout and keyboard controls; screen evidence captured.
+- [ ] Desktop and 390px browser screenshots of the real React screen; no browser verification possible until dependency installation and build.
 - [ ] Independent reviewer records accepted M1 SHA and authorises B/C handoffs.
 - [ ] Future M2–M5 implementation, safety/content review and acceptance before event submission.
 - [ ] Actual GitHub repository created and pushed **only when the owner authorises publication**.
 - [ ] Actual coding-phase form reviewed; correct repository URL entered **only when submission is authorised**.
 
 ## On a connected Windows/macOS/Linux machine
+
+See `docs/M1_REPAIR_VERIFICATION.md` for the ordered Windows-specific follow-up commands and handoff outputs.
 
 Run from the extracted folder containing `.git` and `package.json`:
 

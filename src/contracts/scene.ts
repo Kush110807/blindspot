@@ -103,9 +103,24 @@ export function areRectBoundsValid(rect: NormalizedRect): boolean {
 }
 
 function unique(values: readonly string[]): boolean { return new Set(values).size === values.length; }
+/** Metadata check, not proof of real instructor qualification or approval. */
+export function hasValidInstructorReview(review: ContentReview): boolean {
+  if (!review || review.status !== 'instructor-reviewed' ||
+      typeof review.reviewerRef !== 'string' || review.reviewerRef.trim().length === 0 ||
+      typeof review.reviewedOn !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(review.reviewedOn)) return false;
+  const parsed = new Date(`${review.reviewedOn}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === review.reviewedOn;
+}
 function hasTranslation(value: Translated | undefined): boolean {
   return !!value && typeof value.en === 'string' && value.en.trim().length > 0 &&
     typeof value.hi === 'string' && value.hi.trim().length > 0;
+}
+
+/** Asset metadata must describe a bundled image with accessible text in both locales. */
+export function isValidSceneAsset(asset: SceneAsset): boolean {
+  return !!asset && typeof asset.src === 'string' && asset.src.startsWith('/') &&
+    Number.isFinite(asset.width) && asset.width > 0 &&
+    Number.isFinite(asset.height) && asset.height > 0 && hasTranslation(asset.alt);
 }
 
 /** Content validation for B's scenes. Reports errors; never silently rewrites IDs. */
@@ -117,7 +132,7 @@ export function validateScene(scene: SceneDefinition): string[] {
   const endings = scene.continuations.map(c => c.id);
   if (scene.schemaVersion !== SCENE_SCHEMA_VERSION) errors.push('Unsupported schema version');
   if (!scene.id.trim() || !scene.sceneVersion.trim()) errors.push('Missing scene ID or version');
-  if (!scene.base.src.startsWith('/') || scene.base.width <= 0 || scene.base.height <= 0) errors.push('Invalid base asset');
+  if (!isValidSceneAsset(scene.base)) errors.push('Invalid base asset');
   if (!hasTranslation(scene.title) || !hasTranslation(scene.prompt) || !hasTranslation(scene.noneLabel)) errors.push('Missing UI translation');
   if (scene.visibleConditions.length === 0 || scene.visibleConditions.some(c => !hasTranslation(c))) errors.push('Missing visible conditions');
   if (!unique(regions) || !unique(responses) || !unique(reasons) || !unique(endings)) errors.push('Duplicate ID');
@@ -130,8 +145,8 @@ export function validateScene(scene: SceneDefinition): string[] {
   if (scene.purpose === 'training' && endings.length !== 2) errors.push('Training must define two continuations');
   if (scene.purpose === 'assessment' && endings.length !== 0) errors.push('Assessment must not contain training continuations');
   if (scene.continuations.some(c => !c.id.trim() || !hasTranslation(c.title) || !hasTranslation(c.narrative) ||
-      c.layers.some(l => !l.id.trim() || !areRectBoundsValid(l.bounds) || !l.image.src.startsWith('/') ||
-        !hasTranslation(l.image.alt) || l.image.width <= 0 || l.image.height <= 0))) errors.push('Invalid continuation');
+      c.layers.some(l => !l.id.trim() || !areRectBoundsValid(l.bounds) || !isValidSceneAsset(l.image)))) errors.push('Invalid continuation');
+  if (scene.contentReview?.status !== 'provisional' && !hasValidInstructorReview(scene.contentReview)) errors.push('Invalid instructor review metadata');
   if (scene.rubric.acceptedRegionIds.some(id => !regions.includes(id)) ||
       scene.rubric.acceptedResponseIds.some(id => !responses.includes(id)) ||
       scene.rubric.acceptedReasonIds.some(id => !reasons.includes(id))) errors.push('Rubric refers to missing ID');

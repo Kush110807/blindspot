@@ -71,3 +71,57 @@ test('instructor review gates criteria; continuations never enter classification
   const changedEndings = { ...scene, continuations: [...scene.continuations].reverse() };
   assert.deepEqual(getReviewedCriteria(changedEndings, s.locked), { recognition: true, response: true, reason: true });
 });
+
+test('replay helpers reject wrong scene IDs, revisions and schema versions without changing the locked attempt', () => {
+  const scene = fixture();
+  let state = beginAnswering(createAttempt(scene, () => 0.5));
+  state = chooseReason(chooseResponse(chooseRegion(state, { kind: 'region', regionId: 'left-edge' }, scene), 'wait', scene), 'limited-view', scene);
+  const reviewed = startReview(lockAttempt(state, scene, '2026-10-10T12:00:00.000Z'));
+  const advanced = nextEnding(reviewed, scene);
+  assert.equal(currentEndingId(advanced, scene), 'actor');
+
+  const mismatches = [
+    { ...scene, id: 'other-scene', continuations: scene.continuations.map(c => ({ ...c, id: `other-${c.id}` })) },
+    { ...scene, sceneVersion: 'fixture-v2' },
+    { ...scene, schemaVersion: 2 as unknown as typeof scene.schemaVersion },
+    { ...scene, purpose: 'assessment' as const },
+  ];
+  for (const mismatch of mismatches) {
+    assert.equal(currentEndingId(advanced, mismatch), null);
+    assert.equal(nextEnding(reviewed, mismatch), reviewed, 'wrong scene must not advance');
+    assert.equal(replayEndings(advanced, mismatch), advanced, 'wrong scene must not reset');
+    assert.deepEqual(advanced.locked, reviewed.locked, 'locked answers must remain intact');
+  }
+  const wrongStateSceneId = { ...advanced, sceneId: 'other-scene' };
+  assert.equal(currentEndingId(wrongStateSceneId, scene), null);
+  assert.equal(nextEnding(wrongStateSceneId, scene), wrongStateSceneId);
+  assert.equal(replayEndings(wrongStateSceneId, scene), wrongStateSceneId);
+  assert.equal(currentEndingId(replayEndings(advanced, scene), scene), 'nothing');
+});
+
+test('malformed or missing instructor metadata cannot enable correctness classification', () => {
+  const original = fixture();
+  let state = beginAnswering(createAttempt(original, () => 0.5));
+  state = chooseReason(chooseResponse(chooseRegion(state, { kind: 'region', regionId: 'left-edge' }, original), 'wait', original), 'limited-view', original);
+  const locked = lockAttempt(state, original).locked;
+  const badReviewFields = [
+    undefined,
+    { status: 'unsupported' },
+    { status: 'instructor-reviewed' },
+    { status: 'instructor-reviewed', reviewerRef: '', reviewedOn: '' },
+    { status: 'instructor-reviewed', reviewerRef: '   ', reviewedOn: '2026-10-10' },
+    { status: 'instructor-reviewed', reviewerRef: 'test-only', reviewedOn: '  ' },
+    { status: 'instructor-reviewed', reviewerRef: 'test-only', reviewedOn: '10/10/2026' },
+    { status: 'instructor-reviewed', reviewerRef: 'test-only', reviewedOn: '2026-02-30' },
+    { status: 'instructor-reviewed', reviewerRef: 'test-only', reviewedOn: '2026-13-01' },
+    { status: 'instructor-reviewed', reviewerRef: null, reviewedOn: '2026-10-10' },
+  ];
+  for (const contentReview of badReviewFields) {
+    const invalid = { ...original, contentReview: contentReview as typeof original.contentReview };
+    assert.equal(getReviewedCriteria(invalid, locked), null, JSON.stringify(contentReview));
+    assert.equal(getFeedback(invalid, locked, 'en')?.provisional, true);
+  }
+  const validTestOnly = { ...original, contentReview: { status: 'instructor-reviewed' as const, reviewerRef: 'test-only', reviewedOn: '2026-10-10' } };
+  assert.deepEqual(getReviewedCriteria(validTestOnly, locked), { recognition: true, response: true, reason: true });
+  assert.equal(getFeedback(validTestOnly, locked, 'en')?.provisional, false);
+});

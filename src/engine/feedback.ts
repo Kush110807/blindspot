@@ -1,4 +1,4 @@
-import { translate, type Locale, type SceneDefinition } from '../contracts/scene.ts';
+import { hasValidInstructorReview, translate, type Locale, type SceneDefinition } from '../contracts/scene.ts';
 import type { LockedAttempt } from './attempt.ts';
 
 export interface FeedbackParts {
@@ -19,12 +19,12 @@ export function getFeedback(scene: SceneDefinition, locked: LockedAttempt | null
   return {
     recognition: translate(scene.feedback.recognition, locale),
     response: translate(response, locale), reason: translate(reason, locale),
-    provisional: scene.contentReview.status === 'provisional'
+    provisional: !hasValidInstructorReview(scene.contentReview)
   };
 }
 /** No scored/classified learner evaluation until instructor review exists. */
 export function getReviewedCriteria(scene: SceneDefinition, locked: LockedAttempt | null): ReviewedCriteria | null {
-  if (scene.contentReview.status !== 'instructor-reviewed' || !locked ||
+  if (!hasValidInstructorReview(scene.contentReview) || !locked ||
       locked.sceneId !== scene.id || locked.sceneVersion !== scene.sceneVersion ||
       locked.schemaVersion !== scene.schemaVersion) return null;
   return {

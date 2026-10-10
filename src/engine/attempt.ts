@@ -93,18 +93,26 @@ export function canRevealFeedback(state: AttemptState): boolean {
 export function startReview(state: AttemptState): AttemptState {
   return state.phase === 'locked' && state.locked ? { ...state, phase: 'review' } : state;
 }
+/** Prevent replay against a different scene or revised authored content. */
+function isMatchingTrainingReview(state: AttemptState, scene: SceneDefinition): boolean {
+  const locked = state.locked;
+  return state.phase === 'review' && locked !== null &&
+    state.sceneId === scene.id && locked.sceneId === scene.id &&
+    locked.sceneVersion === scene.sceneVersion && locked.schemaVersion === scene.schemaVersion &&
+    locked.purpose === 'training' && scene.purpose === 'training';
+}
 export function currentEndingId(state: AttemptState, scene: SceneDefinition): EndingId | null {
-  if (state.phase !== 'review' || !state.locked || scene.purpose !== 'training') return null;
+  if (!isMatchingTrainingReview(state, scene)) return null;
   return scene.continuations[state.endingIndex]?.id ?? null;
 }
 export function nextEnding(state: AttemptState, scene: SceneDefinition): AttemptState {
-  if (state.phase !== 'review' || !state.locked || scene.purpose !== 'training' ||
+  if (!isMatchingTrainingReview(state, scene) ||
       state.endingIndex >= scene.continuations.length - 1) return state;
   return { ...state, endingIndex: state.endingIndex + 1 };
 }
 
 /** Replay continuations without restarting or mutating the locked answer. */
 export function replayEndings(state: AttemptState, scene: SceneDefinition): AttemptState {
-  if (state.phase !== 'review' || !state.locked || scene.purpose !== 'training') return state;
+  if (!isMatchingTrainingReview(state, scene)) return state;
   return { ...state, endingIndex: 0 };
 }
