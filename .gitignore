@@ -1,8 +1,34 @@
+# Rebuildable dependencies and production output
 node_modules/
 dist/
+coverage/
 *.log
+npm-debug.log*
+.DS_Store
+
+# Secrets: never commit authentication, keys or machine-specific configuration
 .env
 .env.*
 !.env.example
-coverage/
-.DS_Store
+*.pem
+*.p12
+*.pfx
+*.key
+*.secret
+.npmrc.local
+
+# Personal/local learner records must never be sent with source
+/records/
+/local-records/
+/private/
+/user-data/
+*.sqlite
+*.sqlite3
+*.db
+
+# Local release artifacts, caches and editor state
+/.cache/
+/.vite/
+*.local
+/.vscode/
+/.idea/
