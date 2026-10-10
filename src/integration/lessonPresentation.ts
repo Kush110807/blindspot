@@ -1,6 +1,6 @@
 /** Presentation-only lesson guidance. No schema, scored classification or stored-record changes. */
 import { translate, type Locale, type SceneDefinition, type Translated } from '../contracts/scene.ts';
-import type { LockedAttempt } from '../engine/attempt.ts';
+import type { AttemptState, LockedAttempt, RegionSelection } from '../engine/attempt.ts';
 
 export type LessonDisposition = 'supported' | 'conditional' | 'reconsider';
 export interface LessonPresentation {
@@ -8,6 +8,9 @@ export interface LessonPresentation {
   readonly recognition: LessonDisposition;
   readonly response: LessonDisposition;
   readonly reason: LessonDisposition;
+  /** Shown beside each provisional criterion, never hidden in details. */
+  readonly recognitionRemediation: string | null;
+  readonly reasonRemediation: string | null;
   readonly responseMeaning: string;
   readonly nextStep: string;
   readonly why: string;
@@ -37,6 +40,11 @@ const copy = {
     mixedPrefix: 'Your observation and action need separate consideration.',
     reasonMismatch: 'Your stated reason also needs a rethink.',
     reasonMatch: 'Your stated reason addresses the visibility question.',
+    recognitionMismatchIntro: 'You marked',
+    recognitionMismatchExpected: 'The draft lesson focuses on',
+    recognitionImprove: 'Next time, identify what is actually screened from view (or confirm that the target obstruction is absent), rather than just marking a visible road feature.',
+    reasonMismatchIntro: 'You chose this reason:',
+    reasonImprove: 'For this draft scene, reconsider the initial evidence using:',
   },
   hi: {
     recognized: 'आपने जिस जगह को चुना, वह इस पाठ में लक्षित अधूरे दृश्य से मेल खाती है।',
@@ -56,6 +64,11 @@ const copy = {
     mixedPrefix: 'आपके अवलोकन और कदम का आकलन अलग-अलग करना ज़रूरी है।',
     reasonMismatch: 'आपके दिए कारण पर भी दोबारा विचार करें।',
     reasonMatch: 'आपका कारण दृश्य संबंधी सवाल को पहचानता है।',
+    recognitionMismatchIntro: 'आपने चुना:',
+    recognitionMismatchExpected: 'इस प्रारंभिक पाठ का लक्ष्य है:',
+    recognitionImprove: 'अगली बार देखें कि कौन-सा हिस्सा सच में ओझल है (या लक्षित रुकावट नहीं है), केवल सड़क पर दिखाई दे रही किसी चीज़ को न चुनें।',
+    reasonMismatchIntro: 'आपने यह कारण चुना:',
+    reasonImprove: 'इस प्रारंभिक दृश्य के आधार पर इन कारणों पर फिर विचार करें:',
   }
 } as const;
 
@@ -117,20 +130,44 @@ const endingMessages: Record<string, Readonly<Record<string, Translated>>> = {
   },
 };
 
+/** Use the submitted snapshot for all locked/review highlights, not mutable draft state. */
+export function regionSelectionForViewport(scene: SceneDefinition, attempt: AttemptState): RegionSelection | null {
+  if (attempt.phase !== 'locked' && attempt.phase !== 'review') return attempt.regionSelection;
+  const locked = attempt.locked;
+  if (!locked || attempt.sceneId !== scene.id || locked.sceneId !== scene.id ||
+      locked.sceneVersion !== scene.sceneVersion || locked.schemaVersion !== scene.schemaVersion ||
+      locked.purpose !== scene.purpose) return null;
+  return locked.regionSelection;
+}
+
 export function buildLessonPresentation(scene: SceneDefinition, locked: LockedAttempt | null, locale: Locale, endingId: string | null = null): LessonPresentation | null {
   if (!locked || locked.sceneId !== scene.id || locked.sceneVersion !== scene.sceneVersion || locked.schemaVersion !== scene.schemaVersion) return null;
   const notes = lessons[scene.id];
   if (!notes || !scene.responseOptions.some(o => o.id === locked.responseId) || !scene.reasonOptions.some(o => o.id === locked.reasonId)) return null;
   const t = copy[locale];
-  const recognitionMatches = locked.regionSelection.kind === 'none'
-    ? scene.rubric.acceptsNone : scene.rubric.acceptedRegionIds.includes(locked.regionSelection.regionId);
+  const lockedRegion = locked.regionSelection;
+  const recognitionMatches = lockedRegion.kind === 'none'
+    ? scene.rubric.acceptsNone : scene.rubric.acceptedRegionIds.includes(lockedRegion.regionId);
   const response: LessonDisposition = notes.conditionalResponseIds.includes(locked.responseId) ? 'conditional' :
     scene.rubric.acceptedResponseIds.includes(locked.responseId) ? 'supported' : 'reconsider';
   const reason: LessonDisposition = scene.rubric.acceptedReasonIds.includes(locked.reasonId) ? 'supported' : 'reconsider';
-  const selected = locked.regionSelection.kind === 'none' ? translate(scene.noneLabel, locale) :
-    translate(scene.tapRegions.find(r => r.id === locked.regionSelection.regionId)?.label ?? scene.noneLabel, locale);
+  const chosenReason = scene.reasonOptions.find(option => option.id === locked.reasonId);
+  const authoredReasonFeedback = scene.feedback.reasons[locked.reasonId];
+  if (!chosenReason || !authoredReasonFeedback) return null;
+  const selected = lockedRegion.kind === 'none' ? translate(scene.noneLabel, locale) :
+    translate(scene.tapRegions.find(r => r.id === lockedRegion.regionId)?.label ?? scene.noneLabel, locale);
   const expected = scene.rubric.acceptsNone ? t.expectedNone : scene.rubric.acceptedRegionIds
     .map(id => scene.tapRegions.find(r => r.id === id)).filter(r => r != null).map(r => translate(r.label, locale)).join(' / ');
+  const recognitionRemediation = recognitionMatches ? null :
+    `${t.recognitionMismatchIntro} “${selected}”. ${t.recognitionMismatchExpected} “${expected}”. ` +
+    `${translate(notes.regionExplanation, locale)} ${t.recognitionImprove}`;
+  const supportedReasons = scene.rubric.acceptedReasonIds.flatMap(id => {
+    const option = scene.reasonOptions.find(item => item.id === id);
+    return option ? [translate(option.label, locale)] : [];
+  });
+  const reasonRemediation = reason === 'supported' ? null :
+    `${t.reasonMismatchIntro} “${translate(chosenReason.label, locale)}”. ` +
+    `${translate(authoredReasonFeedback, locale)} ${t.reasonImprove} ${supportedReasons.map(text => `“${text}”`).join(' / ')}`;
   const meaning = notes.responseMeanings[locked.responseId];
   if (!meaning) return null;
   const baseTakeaway = recognitionMatches ? t.matchedPrefix : t.missedPrefix;
@@ -140,6 +177,7 @@ export function buildLessonPresentation(scene: SceneDefinition, locked: LockedAt
   return {
     takeaway,
     recognition: recognitionMatches ? 'supported' : 'reconsider', response, reason,
+    recognitionRemediation, reasonRemediation,
     responseMeaning: translate(meaning, locale), nextStep: translate(notes.nextStep, locale), why: translate(notes.why, locale),
     alternatives: scene.rubric.acceptedResponseIds.flatMap(id => { const option = scene.responseOptions.find(o => o.id === id); return option ? [translate(option.label, locale)] : []; }),
     expectedRegion: expected, selectedRegion: selected,

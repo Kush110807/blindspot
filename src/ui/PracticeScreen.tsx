@@ -3,7 +3,7 @@ import type { Locale, Translated } from '../contracts/scene.ts';
 import { translate } from '../contracts/scene.ts';
 import { canLock } from '../engine/attempt.ts';
 import { SceneViewport } from './SceneViewport.tsx';
-import { buildLessonPresentation, type LessonDisposition } from '../integration/lessonPresentation.ts';
+import { buildLessonPresentation, regionSelectionForViewport, type LessonDisposition } from '../integration/lessonPresentation.ts';
 import '../styles/practice.css';
 
 const copy: Record<Locale, Record<string, string>> = {
@@ -50,7 +50,8 @@ const copy: Record<Locale, Record<string, string>> = {
     responseDiffers: 'This action leaves the scene’s key concern unresolved.',
     reasonMatches: 'Your reason addresses the concern in the initial view.',
     reasonDiffers: 'Your reason overlooks something in the initial view.',
-    noChange: 'This draft does not ask you to replace that basic response. Keep adapting to the conditions as you approach.',
+    noChange: 'Your action is draft-supported. Keep adapting as you approach, and address any recognition or reasoning gaps shown above.',
+    improveCriterion: 'How to improve this part',
     nextScene: 'Continue to next scene', seenBoth: 'View both endings to continue',
   },
   hi: {
@@ -96,7 +97,8 @@ const copy: Record<Locale, Record<string, string>> = {
     responseDiffers: 'यह कदम दृश्य की मुख्य अनिश्चितता दूर नहीं करता।',
     reasonMatches: 'आपका कारण शुरुआती दृश्य के सवाल पर ध्यान देता है।',
     reasonDiffers: 'आपका कारण शुरुआती दृश्य की एक ज़रूरी बात छोड़ता है।',
-    noChange: 'यह मसौदा आपके मूल कदम को बदलने के लिए नहीं कहता। पास पहुँचते समय बदलती स्थिति देखते रहें।',
+    noChange: 'आपका कदम इस प्रारंभिक पाठ में समर्थित है। पास आते समय स्थिति देखते रहें और ऊपर बताई गई पहचान या कारण की कमी भी सुधारें।',
+    improveCriterion: 'इस हिस्से को कैसे सुधारें',
     nextScene: 'अगले दृश्य पर जाएँ', seenBoth: 'आगे जाने से पहले दोनों अंत देखें',
   },
 };
@@ -206,7 +208,7 @@ export function PracticeScreen(props: PracticeScreenProps) {
         <div className="bs-workspace">
           <section className="bs-scene-panel" aria-label={t.visual}>
             <div className="bs-panel-head"><span className="bs-panel-kicker"><span className="bs-panel-dot" /> {t.visual}</span><span className="bs-panel-subtle">{currentEnding ? t.continuation : t.original}</span></div>
-            <SceneViewport scene={scene} locale={locale} selected={attempt.regionSelection} canSelect={isAnswering}
+            <SceneViewport scene={scene} locale={locale} selected={regionSelectionForViewport(scene, attempt)} canSelect={isAnswering}
               ending={currentEnding} review={canReview} onSelectRegion={onSelectRegion} />
             {isAnswering && <p className="bs-map-caption"><span aria-hidden="true">◎</span> {t.regionHelp}</p>}
             {canReview && lesson && <div className="bs-region-comparison" data-testid="region-comparison">
@@ -292,6 +294,14 @@ export function PracticeScreen(props: PracticeScreenProps) {
                     <article key={criterion} data-testid={`criterion-${criterion}`}>
                       <div className="bs-criterion-heading"><h3>{name}</h3><span className={`bs-criterion-status bs-criterion-status--${lesson[criterion]}`}>{statusText(lesson[criterion])}</span></div>
                       <p>{compactCriterion(criterion)}</p>
+                      {criterion === 'recognition' && lesson.recognitionRemediation &&
+                        <div className="bs-criterion-remediation" data-testid="recognition-remediation">
+                          <strong>{t.improveCriterion}</strong><p>{lesson.recognitionRemediation}</p>
+                        </div>}
+                      {criterion === 'reason' && lesson.reasonRemediation &&
+                        <div className="bs-criterion-remediation" data-testid="reason-remediation">
+                          <strong>{t.improveCriterion}</strong><p>{lesson.reasonRemediation}</p>
+                        </div>}
                     </article>
                   )}
                 </section>

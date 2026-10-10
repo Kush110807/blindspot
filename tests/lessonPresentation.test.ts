@@ -133,3 +133,97 @@ test('a supported response with a weak reason remains a mixed answer', () => {
   assert.equal(view.reason,'reconsider');
   assert.match(view.takeaway,/reason also needs a rethink/);
 });
+
+test('supported action still exposes precise recognition remediation in both languages', () => {
+  const scene = scenes[1];
+  // Use a real mismatched selectable region, never a guessed ID.
+  const wrongRegion = scene.tapRegions.find(r => !scene.rubric.acceptedRegionIds.includes(r.id));
+  assert.ok(wrongRegion);
+  for (const locale of ['en','hi'] as const) {
+    const result = buildLessonPresentation(scene,
+      locked(scene,{kind:'region',regionId:wrongRegion.id},'ease-monitor-side-entry','van-limits-side-view'),locale);
+    assert.ok(result);
+    assert.equal(result.response,'supported'); assert.equal(result.recognition,'reconsider');
+    assert.equal(result.reason,'supported'); assert.equal(result.reasonRemediation,null);
+    assert.ok(result.recognitionRemediation);
+    assert.ok(result.recognitionRemediation.includes(wrongRegion.label[locale]));
+    assert.ok(result.recognitionRemediation.includes(scene.tapRegions.find(r => r.id === scene.rubric.acceptedRegionIds[0])!.label[locale]));
+    assert.ok(result.recognitionRemediation.includes(result.regionExplanation));
+    assert.match(result.recognitionRemediation,locale === 'en' ? /Next time/ : /अगली बार/);
+  }
+});
+
+test('supported action still exposes reason-specific remediation instead of hiding it in details', () => {
+  const scene = scenes[0];
+  const reason = scene.reasonOptions.find(r => r.id === 'width-means-safe');
+  assert.ok(reason);
+  for (const locale of ['en','hi'] as const) {
+    const result = buildLessonPresentation(scene,
+      locked(scene,{kind:'region',regionId:'space-beyond-bus'},'stay-back-reassess','width-means-safe'),locale);
+    assert.ok(result);
+    assert.equal(result.response,'supported'); assert.equal(result.recognition,'supported'); assert.equal(result.reason,'reconsider');
+    assert.equal(result.recognitionRemediation,null);
+    assert.ok(result.reasonRemediation?.includes(reason.label[locale]));
+    assert.ok(result.reasonRemediation?.includes(scene.feedback.reasons['width-means-safe'][locale]));
+    const acceptedReason = scene.reasonOptions.find(r => scene.rubric.acceptedReasonIds.includes(r.id));
+    assert.ok(acceptedReason); assert.ok(result.reasonRemediation?.includes(acceptedReason.label[locale]));
+  }
+});
+
+test('clear-view incorrectly marked region explains absence of obstruction in both languages', () => {
+  const scene = scenes[2];
+  for (const locale of ['en','hi'] as const) {
+    const result = buildLessonPresentation(scene,
+      locked(scene,{kind:'region',regionId:'open-right-entry'},'ease-and-check','open-view-still-scan'),locale);
+    assert.ok(result);
+    assert.equal(result.response,'supported'); assert.equal(result.recognition,'reconsider');
+    assert.ok(result.recognitionRemediation?.includes(result.regionExplanation));
+    assert.ok(result.recognitionRemediation?.includes(result.expectedRegion));
+    assert.equal(result.reasonRemediation,null);
+  }
+});
+
+test('conditional response stays conditional alongside criterion-specific corrections', () => {
+  const scene = scenes[1];
+  const result = buildLessonPresentation(scene,
+    locked(scene,{kind:'none'},'shift-center-to-see','no-one-visible-van'),'en');
+  assert.ok(result);
+  assert.equal(result.response,'conditional');
+  assert.equal(result.recognition,'reconsider');
+  assert.equal(result.reason,'reconsider');
+  assert.ok(result.recognitionRemediation?.includes('No relevant blocked region'));
+  const selectedReason = scene.reasonOptions.find(r => r.id === 'no-one-visible-van');
+  assert.ok(selectedReason);
+  assert.ok(result.reasonRemediation?.includes(selectedReason.label.en));
+  assert.ok(result.reasonRemediation?.includes(scene.feedback.reasons['no-one-visible-van'].en));
+});
+
+test('viewport selection uses immutable locked snapshot even if live selection diverges', async () => {
+  const { regionSelectionForViewport } = await import('../src/integration/lessonPresentation.ts');
+  const scene = scenes[0];
+  const snapshot = locked(scene,{kind:'region',regionId:'space-beyond-bus'},'stay-back-reassess','bus-hides-conflict');
+  const state = {
+    phase:'review' as const,sceneId:scene.id,regionSelection:{kind:'region' as const,regionId:scene.tapRegions[1].id},
+    responseId:'horn-hold-speed',reasonId:'width-means-safe',displayedOrder:snapshot.displayedOrder,
+    locked:snapshot,endingIndex:1
+  };
+  assert.notDeepEqual(state.regionSelection,snapshot.regionSelection);
+  assert.deepEqual(regionSelectionForViewport(scene,state),snapshot.regionSelection);
+  assert.deepEqual(regionSelectionForViewport(scene,{...state,regionSelection:{kind:'none'}}),snapshot.regionSelection);
+  assert.deepEqual(regionSelectionForViewport(scene,{...state,regionSelection:null}),snapshot.regionSelection);
+  assert.deepEqual(regionSelectionForViewport(scene,{...state,phase:'locked'}),snapshot.regionSelection);
+  assert.deepEqual(regionSelectionForViewport(scene,{...state,phase:'answering'}),state.regionSelection);
+  assert.equal(regionSelectionForViewport(scene,{...state,locked:{...snapshot,sceneVersion:'stale'}}),null);
+  assert.equal(regionSelectionForViewport(scene,{...state,locked:{...snapshot,sceneId:'other'}}),null);
+  assert.equal(regionSelectionForViewport(scene,{...state,locked:{...snapshot,schemaVersion:0 as 1}}),null);
+  assert.equal(regionSelectionForViewport(scene,{...state,locked:null}),null);
+});
+
+test('actual PracticeScreen viewport binding uses the immutable-selection helper', async () => {
+  const { readFileSync } = await import('node:fs');
+  const source = readFileSync(new URL('../src/ui/PracticeScreen.tsx',import.meta.url),'utf8');
+  assert.match(source,/<SceneViewport\s+scene=\{scene\}\s+locale=\{locale\}\s+selected=\{regionSelectionForViewport\(scene, attempt\)\}/);
+  assert.match(source,/data-testid="recognition-remediation"/);
+  assert.match(source,/data-testid="reason-remediation"/);
+  assert.ok(source.indexOf('data-testid="recognition-remediation"') < source.indexOf('<details className="bs-expand"'));
+});

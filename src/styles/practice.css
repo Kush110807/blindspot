@@ -226,3 +226,8 @@
   .bs-ending-card {padding:14px}
   .bs-review-area>span {font-size:6px}
 }
+
+/* Criterion-specific remediation stays visible; detailed feedback remains optional. */
+.bs-criterion-remediation {margin-top:10px;padding:11px 12px;background:#24333b;border-left:3px solid #e6b672;border-radius:0 7px 7px 0}
+.bs-criterion-remediation strong {display:block;color:#ffdda6;font-size:11px;font-weight:800;margin-bottom:5px}
+.bs-criteria article .bs-criterion-remediation p {color:#ecf0e4;font-size:12px;line-height:1.6;margin:0;overflow-wrap:anywhere}
