@@ -54,9 +54,9 @@ The sample in `tests/fixture.ts` exists only to exercise the contract. It is **n
 Any proposed v1 schema, exported API or locked-record change requires A (integration) to propose migration and this review chat to approve **before** B or C implement dependent changes. Record subsequent accepted SHA in the integration ledger. Do not fork contracts across chats.
 
 
-## 8. Exact B/C integration interface (reserved until M1 acceptance)
+## 8. Exact B/C integration interface (accepted and frozen at M1)
 
-These imports/exports are **agreed targets, not implemented learner functionality**. Source type contract: [`src/contracts/integration.ts`](../src/contracts/integration.ts). A owns that file; B/C may not edit it. React's JSX, callback implementation and route wiring remain M2/M3.
+These imports/exports are **frozen contracts; B/C components are still separate implementation deliverables**. Source type contract: [`src/contracts/integration.ts`](../src/contracts/integration.ts). A owns that file; B/C may not edit it. React's JSX, callback implementation and route wiring remain M2/M3.
 
 ### B: authored scenes and language
 
@@ -76,8 +76,16 @@ These imports/exports are **agreed targets, not implemented learner functionalit
 ### A: application coordinator
 
 - **Module path:** `src/App.tsx` (owned by A; existing M1 screen remains until integration).
-- A imports B's named `scenes` and C's named `PracticeScreen` **only after independent M1 approval**. A owns `locale`, `attempt`, current scene index, effects, once-per-lock persistence, storage diagnostics and all navigation/restart/next-scene gating. A constructs `feedback` with `getFeedback(scene, locked, locale)` **only after lock**, constructs `reviewedCriteria` via `getReviewedCriteria` **only after lock**, and never uses `continuations` or a displayed ending to classify an answer.
+- A imports B's named `scenes` and C's named `PracticeScreen` **now that independent M1 approval has been recorded**. A owns `locale`, `attempt`, current scene index, effects, once-per-lock persistence, storage diagnostics and all navigation/restart/next-scene gating. A constructs `feedback` with `getFeedback(scene, locked, locale)` **only after lock**, constructs `reviewedCriteria` via `getReviewedCriteria` **only after lock**, and never uses `continuations` or a displayed ending to classify an answer.
 - `onLock` must refuse incomplete attempts and save the locked record only once after transition; persistence failure must not stop the practice. `onNextScene` only works when `canNextScene` is true; a restart is explicit and produces a new attempt; back navigation never silently discards a locked attempt. Language changes must retain selected IDs. No personal identifiers in records.
-- B/C are not authorised to start until independent reviewer freezes a **new** M1 SHA. If any component prop or scene schema change is needed, request approval from A/review first.
+- B/C are released to begin from accepted M1 SHA `3bb4fff2c6ba5abcb0d16ae22766f3de91c3b47e`. If any component prop or scene schema change is needed, request approval from A/review first.
 
 **Storage/schema migration:** None in this repair. `SceneDefinition.schemaVersion` and `LockedAttempt.recordVersion` remain 1, and no saved-data fields change.
+
+## 9. A-owned runtime coordinator after M1 acceptance
+
+`src/integration/coordinator.ts` provides `catalogueErrors`, `createSession`, `reduceSession`, `canAdvance`, `selectPracticeView` and `persistSessionRecords`; `src/integration/usePracticeCoordinator.ts` owns React reducer, localStorage hydration and a once-per-committed-lock write effect. The pure reducer carries intent-specific `sceneId` guards; `lockedAt` and shuffle seeds are dispatched as payloads so reducer re-execution does not generate inconsistent values. All scene labels and explanation fragments remain B-owned; the display component remains C-owned. Locale changes never rewrite selected stable IDs or option order.
+
+The current competition prototype deliberately returns `reviewedCriteria: null` regardless of a test-only metadata claim and `catalogueErrors` refuses any non-provisional authored scene. Explanatory feedback is supplied only in `review`, not `observe`, `answering` or `locked`. A training scene can advance only after its second continuation; replay does not unlock and resets the next-scene gate. Failed storage stays in memory, and an already corrupt local store is never overwritten automatically.
+
+`src/integration/slots.ts` is A's temporary build-safe seam: it exports `scenes: SceneCatalogue = []` and `PracticeScreen: ComponentType<PracticeScreenProps> | null = null`. Once both worker commits have been independently reviewed, A replaces only those exports with B's named `scenes` and C's named `PracticeScreen`; `src/App.tsx` already wires all eleven callbacks. The foundation mount screen remains until then. No schema/record migrations or frozen interface changes occurred.

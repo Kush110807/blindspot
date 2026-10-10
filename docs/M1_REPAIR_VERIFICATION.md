@@ -1,6 +1,6 @@
 # BlindSpot M1 repair — verification and completion record
 
-**Candidate only: M1 REPAIR REQUIRED until independent reviewer accepts a new SHA.** No M2 work, publication, learner scenes or submitted GitHub repo.
+**Historical M1 repair report — superseded acceptance status.** Independent M1 review has **accepted** the subsequent canonical baseline `3bb4fff2c6ba5abcb0d16ae22766f3de91c3b47e`. Its genuine npm lockfile and pinned Vite 6.4.4 were verified on Windows (Node 22.16.0 / npm 10.9.2): fresh `npm ci`, `npm run check`, zero-vulnerability `npm audit`, `verify:repo`, and desktop/375px Chromium-emulated foundation views. These are **user-supplied Windows evidence**, not checks reproduced in this integration sandbox. The dated repair-sandbox table below is preserved as a historical record of earlier blockers; it no longer describes the accepted baseline. A runtime integration now proceeds on a separate A-owned branch; no B/C product content is claimed integrated.
 
 ## Starting point and repairs
 
@@ -9,7 +9,7 @@ Starting commit (verified): `78062ec497303a0dcf764775febe9f20fb8c6406`.
 - **BS-M1-01:** `currentEndingId`, `nextEnding`, `replayEndings` require matching `state.sceneId`, locked `sceneId`, `sceneVersion`, `schemaVersion`, training `purpose`. Invalid input returns `null` or the unchanged state.
 - **BS-M1-02:** strict, nonempty `reviewerRef` and an actual valid `YYYY-MM-DD` reviewed date required before reviewed correctness classification. Otherwise explanations remain provisional, without a correctness verdict. Metadata is not proof of human review.
 - **BS-M1-03:** base and layer assets share validation of both nonblank English and Hindi alt text, `Number.isFinite(width/height)`, and positive natural dimensions.
-- **BS-M1-04:** supported Node/npm present but npm registry DNS unavailable (`EAI_AGAIN`). No genuine npm lockfile or installed React/Vite packages, so dependent acceptance checks are blocked.
+- **BS-M1-04 (historical repair sandbox):** npm registry DNS was unavailable (`EAI_AGAIN`) at the time of repair. The subsequent Windows commit `3bb4fff` resolved the lockfile requirement and supplied successful checks, accepted independently.
 - **B/C integration:** exact proposed imports, `PracticeScreenProps` callbacks and ownership frozen in `src/contracts/integration.ts` and `docs/CONTRACTS.md` §8. No screen/scenes implemented.
 
 Scene schema remains v1; local record format remains v1, and no migration is required. Added exported helpers: `hasValidInstructorReview`, `isValidSceneAsset`; no breaking API changes.

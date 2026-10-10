@@ -1,6 +1,6 @@
-# Ownership and handoff — proposed after M1 gate
+# Ownership and handoff — frozen after accepted M1 gate
 
-**One canonical Git baseline. No shared simultaneous production-code edits.** Each workstream branches from the exact accepted M1 commit; send a commit/patch ZIP, not an untracked whole-project replacement. A alone merges and runs release checks. This document is a proposed ownership allocation awaiting independent acceptance.
+**One canonical Git baseline. No shared simultaneous production-code edits.** Each workstream branches from the exact accepted M1 commit; send a commit/patch ZIP, not an untracked whole-project replacement. A alone merges and runs release checks. The independent reviewer accepted M1 SHA `3bb4fff2c6ba5abcb0d16ae22766f3de91c3b47e`. A explicitly releases B/C now; A builds only in isolated `integration/a-m2-runtime`.
 
 | Stream | Exact owned paths for future changes | Excluded from independent edits |
 |---|---|---|
@@ -25,3 +25,7 @@ A wires C's exported screen into `src/App.tsx` after both patch streams are acce
 **C** later creates `src/ui/PracticeScreen.tsx` with named `PracticeScreen(props: PracticeScreenProps)`; A-owned `src/contracts/integration.ts` has every prop and callback type. C owns rendering, keyboard/phone interaction, visual state only. It must not independently store selected answers, locale, records or navigation progression. No C screen is implemented at M1.
 
 **A** later integrates B's `scenes` and C's `PracticeScreen` in `src/App.tsx`, and alone owns attempt state/transitions, language selection, persistence, feedback/classification gating and next/restart gating. A is the only writer of the exported prop interface, schema, dependency manifests and lockfile. See section 8 of `docs/CONTRACTS.md` for exact callbacks and invariants.
+
+## A integration slots (2026-10-10)
+
+A alone owns `src/integration/**` including the pure coordinator, React state/persistence hook and temporary `slots.ts`. B/C work from the accepted baseline on separate branches and do not edit this directory. `slots.ts` exports empty `scenes` and `PracticeScreen = null` until A cherry-picks accepted worker commits; only A switches it to the B/C named exports. The accepted `src/contracts/integration.ts` props/callbacks remain unchanged.
