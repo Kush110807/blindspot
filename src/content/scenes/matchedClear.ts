@@ -3,11 +3,11 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Matched composition to unfamiliar-blocked-01, without the stationary van. */
 export const matchedClearScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.0.0-provisional',
+  sceneVersion: '1.0.1-provisional',
   id: 'matched-clear-01',
   purpose: 'assessment',
   condition: 'clear-view-control',
-  title: { en: 'The open side-street view', hi: 'बगल की सड़क का खुला दृश्य' },
+  title: { en: 'Near the side-street entrance', hi: 'बगल वाली सड़क के प्रवेश के पास' },
   prompt: {
     en: 'Inspect this view. Mark one area, or choose none. Then choose a response and your main reason.',
     hi: 'इस दृश्य को देखें। एक हिस्सा चुनें या “कोई नहीं” चुनें। फिर अपना कदम और मुख्य कारण चुनें।',
@@ -18,8 +18,8 @@ export const matchedClearScene: SceneDefinition = {
       hi: 'आप दाईं ओर की एक छोटी जोड़ने वाली सड़क के पास पहुँच रहे हैं।',
     },
     {
-      en: 'The entrance and the nearby part of the road are visible. Your lane ahead remains available.',
-      hi: 'प्रवेश और उसके पास की सड़क दिखाई दे रही है। आपके सामने अपनी लेन में आगे बढ़ने की जगह है।',
+      en: 'A small vehicle is farther ahead on the left; there is room to continue in your lane.',
+      hi: 'बाईं ओर कुछ दूरी पर एक छोटी गाड़ी है; आपकी लेन में आगे बढ़ने की जगह है।',
     },
   ],
   base: {
@@ -27,8 +27,8 @@ export const matchedClearScene: SceneDefinition = {
     width: 1280,
     height: 720,
     alt: {
-      en: 'Rider-eye view of the same street and right-hand side entrance as the delivery-van scene, now with no van covering the entrance. A small vehicle is farther ahead on the left; the road is not described as hazard-free.',
-      hi: 'डिलीवरी वैन वाले दृश्य की वही सड़क और दाईं ओर का प्रवेश, लेकिन इस बार उसे छिपाने वाली वैन नहीं है। बाईं ओर कुछ दूरी पर छोटी गाड़ी दिख रही है; सड़क को पूरी तरह जोखिम-मुक्त नहीं बताया गया है।',
+      en: 'Illustrated rider-eye view approaching a side-street entrance on the right, with a small vehicle farther ahead on the left and road space near the entrance visible.',
+      hi: 'राइडर की नज़र से बना चित्र: दाईं ओर जोड़ने वाली सड़क का प्रवेश, बाईं ओर कुछ दूरी पर एक छोटी गाड़ी और प्रवेश के पास दिखाई देती सड़क की जगह।',
     },
   },
   tapRegions: [
@@ -69,17 +69,17 @@ export const matchedClearScene: SceneDefinition = {
       },
     },
     {
-      id: 'accelerate-because-clear',
+      id: 'speed-up-to-pass-sooner',
       label: {
-        en: 'Accelerate because the entrance is visible.',
-        hi: 'प्रवेश दिख रहा है, इसलिए रफ़्तार बढ़ाएँ।',
+        en: 'Increase speed a little to get past the visible entrance sooner.',
+        hi: 'दिखाई दे रहे प्रवेश के पास से जल्दी निकलने के लिए थोड़ी रफ़्तार बढ़ाएँ।',
       },
     },
     {
-      id: 'stop-because-any-side-street',
+      id: 'horn-and-maintain-pace',
       label: {
-        en: 'Stop indefinitely because every side street must be blocked.',
-        hi: 'अनिश्चित समय तक रुकें, क्योंकि हर बगल वाली सड़क पर दृश्य बाधित ही होगा।',
+        en: 'Give a brief horn and maintain your pace past the entrance.',
+        hi: 'प्रवेश के पास से गुज़रते समय हल्का हॉर्न दें और अपनी रफ़्तार बनाए रखें।',
       },
     },
   ],
@@ -92,24 +92,24 @@ export const matchedClearScene: SceneDefinition = {
       },
     },
     {
-      id: 'visible-means-no-risk',
+      id: 'quiet-entrance-less-attention',
       label: {
-        en: 'A visible entrance means no road user can appear.',
-        hi: 'प्रवेश दिखाई देता है, इसलिए कोई सड़क उपयोगकर्ता सामने नहीं आ सकता।',
+        en: 'The entrance looks quiet at the moment, so it needs less attention now.',
+        hi: 'प्रवेश अभी शांत दिखता है, इसलिए फिलहाल उस पर कम ध्यान देने की ज़रूरत है।',
       },
     },
     {
-      id: 'every-side-street-blocked',
+      id: 'side-street-still-needs-checking',
       label: {
-        en: 'Any side street is automatically a hidden-view obstruction.',
-        hi: 'हर बगल वाली सड़क अपने-आप दृश्य बाधित करने वाली जगह होती है।',
+        en: 'Even without a parked vehicle, traffic could turn out of a side street as I approach.',
+        hi: 'खड़ी गाड़ी न होने पर भी पास पहुँचने तक बगल की सड़क से कोई गाड़ी मुड़कर आ सकती है।',
       },
     },
     {
-      id: 'faster-is-easier',
+      id: 'passing-faster-reduces-exposure',
       label: {
-        en: 'Higher speed makes the entrance easier to assess.',
-        hi: 'तेज़ गति से प्रवेश की स्थिति को समझना आसान होता है।',
+        en: 'Getting past the entrance sooner leaves less chance for cross-traffic to reach me.',
+        hi: 'प्रवेश के पास से जल्दी निकलने पर बगल की गाड़ी के मेरे सामने आने की संभावना कम रहती है।',
       },
     },
   ],
@@ -132,13 +132,13 @@ export const matchedClearScene: SceneDefinition = {
         en: 'A small speed reduction while checking the entrance can be reasonable. This draft does not treat appropriate caution as an error simply because the target obstruction is absent.',
         hi: 'प्रवेश को देखते हुए थोड़ी रफ़्तार घटाना उचित हो सकता है। इस मसौदे में लक्ष्य रुकावट न होने के कारण उचित सावधानी को गलत नहीं माना गया है।',
       },
-      'accelerate-because-clear': {
-        en: 'Being able to see the entrance does not justify accelerating without checking other road users and the situation ahead.',
-        hi: 'प्रवेश दिखाई देने का मतलब यह नहीं कि दूसरे सड़क उपयोगकर्ताओं और आगे की स्थिति को देखे बिना तेज़ होना उचित है।',
+      'speed-up-to-pass-sooner': {
+        en: 'Crossing the visible entrance sooner may feel efficient, but speed should follow the actual surrounding traffic and available reaction space. A clear sightline by itself is not a reason to accelerate.',
+        hi: 'दिखाई दे रहे प्रवेश के पास से जल्दी निकलना सुविधाजनक लग सकता है, लेकिन रफ़्तार आसपास की गाड़ियों और प्रतिक्रिया के लिए उपलब्ध जगह के अनुसार होनी चाहिए। सिर्फ साफ़ दृश्य रफ़्तार बढ़ाने का कारण नहीं है।',
       },
-      'stop-because-any-side-street': {
-        en: 'The particular blocked view being tested is absent. A blanket assumption that every side street requires an indefinite stop does not use the available visual evidence.',
-        hi: 'जिस बाधित दृश्य की यहाँ जाँच है, वह मौजूद नहीं है। हर बगल वाली सड़क पर अनिश्चित समय तक रुकना ज़रूरी मानना उपलब्ध दृश्य जानकारी का उपयोग नहीं करता।',
+      'horn-and-maintain-pace': {
+        en: 'A brief horn may draw attention, but it does not replace checking the side entrance as traffic changes. In this scene, maintaining pace can be reasonable only with continued observation and enough space to respond, not on the horn alone.',
+        hi: 'हल्का हॉर्न किसी का ध्यान खींच सकता है, लेकिन बदलते ट्रैफ़िक में बगल के प्रवेश को देखते रहने की जगह नहीं ले सकता। यहाँ रफ़्तार बनाए रखना तभी उचित हो सकता है जब नज़र रखी जाए और प्रतिक्रिया की पर्याप्त जगह हो, सिर्फ हॉर्न के भरोसे नहीं।',
       },
     },
     reasons: {
@@ -146,17 +146,17 @@ export const matchedClearScene: SceneDefinition = {
         en: 'This separates recognising a visible entrance from remaining observant; no relevant blocked region is not the same as no possible hazard.',
         hi: 'यह दिखाई दे रहे प्रवेश को पहचानने और सतर्क बने रहने में अंतर करता है; “कोई संबंधित ओझल हिस्सा नहीं” का मतलब “कोई जोखिम नहीं” नहीं है।',
       },
-      'visible-means-no-risk': {
-        en: 'Clear sightlines reduce this specific uncertainty but do not rule out traffic or other changes in the scene.',
-        hi: 'साफ़ दृश्य से यह खास अनिश्चितता घटती है, लेकिन सड़क पर दूसरे लोगों की गतिविधि या बदलाव की संभावना खत्म नहीं होती।',
+      'quiet-entrance-less-attention': {
+        en: 'A quiet-looking entrance is not a guarantee that a person or vehicle will not approach as you get closer. Its being visible still allows—and calls for—ongoing observation.',
+        hi: 'अभी शांत दिखने वाला प्रवेश यह गारंटी नहीं देता कि पास पहुँचने तक कोई व्यक्ति या गाड़ी नहीं आएगी। प्रवेश दिखाई देता है, इसलिए बदलती स्थिति पर नज़र रखना संभव भी है और ज़रूरी भी।',
       },
-      'every-side-street-blocked': {
-        en: 'The entrance is shown in the illustration, so an assumption that it must be concealed does not fit these initial conditions.',
-        hi: 'चित्र में प्रवेश दिखाई दे रहा है, इसलिए उसे निश्चित रूप से ओझल मानना इन शुरुआती परिस्थितियों से मेल नहीं खाता।',
+      'side-street-still-needs-checking': {
+        en: 'This is a defensible reason to continue monitoring: an entrance can remain visible while another road user later turns into view. It does not require labelling the entrance as a blocked region.',
+        hi: 'इस कारण से प्रवेश पर नज़र बनाए रखना उचित है: प्रवेश दिखने के बावजूद बाद में कोई गाड़ी वहाँ से मुड़कर आ सकती है। इसका मतलब प्रवेश को ओझल हिस्सा मानना नहीं है।',
       },
-      'faster-is-easier': {
-        en: 'Riding faster does not by itself improve sightlines or the time available to interpret a changing view.',
-        hi: 'तेज़ चलने से अपने-आप दृश्य साफ़ नहीं होता और बदलती स्थिति को समझने के लिए अधिक समय भी नहीं मिलता।',
+      'passing-faster-reduces-exposure': {
+        en: 'Spending less time near the entrance does not necessarily reduce conflict risk: increasing speed can leave less time to notice and respond to turning traffic. The visible conditions do not support a faster pass by default.',
+        hi: 'प्रवेश के पास कम समय बिताने से जोखिम ज़रूरी नहीं कि घटे: रफ़्तार बढ़ाने पर मुड़ती गाड़ियों को देखने और प्रतिक्रिया देने के लिए समय कम हो सकता है। इस दृश्य में अपने-आप तेज़ निकलने का आधार नहीं है।',
       },
     },
   },
@@ -164,7 +164,7 @@ export const matchedClearScene: SceneDefinition = {
     acceptedRegionIds: [],
     acceptsNone: true,
     acceptedResponseIds: ['scan-controllable-pace', 'ease-and-check'],
-    acceptedReasonIds: ['open-view-still-scan'],
+    acceptedReasonIds: ['open-view-still-scan', 'side-street-still-needs-checking'],
   },
   contentReview: { status: 'provisional' },
 };

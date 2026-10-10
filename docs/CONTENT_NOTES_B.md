@@ -7,7 +7,7 @@
 - **Base Git commit:** `3bb4fff2c6ba5abcb0d16ae22766f3de91c3b47e`; B branch `chat-b/scenes-bilingual-3bb4fff`.
 - **Contract:** unchanged scene schema v1, named `scenes: SceneCatalogue` in `src/content/scenes/index.ts` in required order. A owns locale, state/lock, review gating and integration; C owns UI and adaptive image renderer. No new shared exported UI-copy contract.
 - **Proposal basis:** *BlindSpot_Hackoverflow_Submission_Final(1).pdf*, pp. 3–5 (bus decision, two endings and draft accepted alternatives), pp. 7–8 (static SVG and three-scene scope), p. 10 (proposal-only sources and caveats). The following assets and Hindi wording are **new B-authored interpretations**, not copied artwork from that document.
-- **Version:** `1.0.0-provisional` for all scenes; bump each `sceneVersion` whenever its artwork, tap geometry, translations, answer mapping or rubric changes.
+- **Current candidate version:** `1.0.1-provisional` for all three scenes. Parent B candidate `e0c6a0f67800b3ccfd8fdd7c1874d591fec4822a` authored `1.0.0-provisional`; this targeted review revision changes bilingual feedback, assessment options, draft rubrics and pre-lock clear-scene wording. Asset artwork and tap geometry are unchanged. Bump `sceneVersion` for any later content or rubric change.
 
 ## Content matrix
 
@@ -15,9 +15,41 @@
 | --- | --- | --- | --- | --- |
 | `bus-training-01` (training / blocked-view) | Parked bus at left hides part of the far roadside; visible opposing-lane vehicle; ability to ease off progressively | 4 named region buttons + explicit `none`; `space-beyond-bus`, **not** `none` | `ease-prepare-to-stop`, `stay-back-reassess`; reason `bus-hides-conflict` | **Two** endings: `no-one-emerges` (no overlays), then `pedestrian-emerges` (one transparent non-graphic actor). Feedback by locked response/reason IDs, independent of ending |
 | `unfamiliar-blocked-01` (assessment / blocked-view) | Side-street entrance right; parked delivery van near entrance; distant left vehicle | 4 neutral region buttons + `none`; `beside-delivery-van`, **not** `none` | `ease-monitor-side-entry`, `wait-for-better-view`; reason `van-limits-side-view` | **Zero** continuations; post-lock-only provisional fragments |
-| `matched-clear-01` (assessment / clear-view-control) | **Same street composition** as unfamiliar scene, but no van covering the right-hand entry; distant left vehicle remains | 4 neutral region buttons + explicit `none`; `acceptsNone: true`, empty acceptedRegionIds | `scan-controllable-pace`, `ease-and-check`; reason `open-view-still-scan` | **Zero** continuations; provisional explanations distinguish absent *target obstruction* from absent road hazards |
+| `matched-clear-01` (assessment / clear-view-control) | **Same street composition** as unfamiliar scene, but no van covering the right-hand entry; distant left vehicle remains | 4 neutral region buttons + explicit `none`; `acceptsNone: true`, empty acceptedRegionIds | `scan-controllable-pace`, `ease-and-check`; reasons `open-view-still-scan`, `side-street-still-needs-checking` | **Zero** continuations; provisional explanations distinguish absent *target obstruction* from absent road hazards |
 
 The bus scene uses **four** draft main-reason options, including the separate “nobody currently visible” misconception requested by the verified B handoff. The proposal slide listed three. The surviving rationale is the proposal's reason “bus hides a possible conflict,” represented as a semantic ID rather than its slide index. The draft acceptance of responses 2 and 4 is likewise ID-based, *not* an instructor-validated result. Both assessment rubrics are additional provisional authored hypotheses, not proposal-validated answers.
+
+## Independent-review repair — candidate `1.0.1-provisional`
+
+All three scenes changed, with **no contract, schema, runtime, artwork or tap-box changes**. Proposed acceptance continues to be provisional and must not be displayed as validated learner correctness before a qualified and documented instructor review.
+
+1. **Bus training: response-level feedback explicitly compares both outcomes.** Each of the four `feedback.responses[responseId]` pairs (`en` and `hi`) now discusses (a) **nobody emerges** and (b) **a pedestrian emerges**, then returns to the **unchanged starting evidence**. This applies to both draft-accepted options (`ease-prepare-to-stop`, `stay-back-reassess`) and both draft-unaccepted options (`horn-hold-speed`, `brief-slow-then-resume`). The first ending does not retrospectively vindicate a risky response; the second does not prove that a cautious response prevents a collision. A horn may draw attention but does not restore a blocked sightline. Existing `recognition`, `reasons`, continuation IDs and the draft bus rubric remain unchanged; no ending-specific schema field or classification was added.
+2. **Blocked-view assessment: more believable near-misses.** Continuing at current pace is now presented as a response to an apparently open *forward lane* rather than the claim that a parked van makes all traffic safe. A modest lateral shift to improve sightlines replaces an immediate move toward the road centre; feedback explains the trade-off without calling all shifts unsafe. The two weak reason absolutes were replaced with plausible but incomplete evidence: focus on the forward lane because the van is stationary, and assume a quiet side entrance because no cross-traffic was spotted. `centre-improves-sightline` (formerly `centre-always-gives-room`) and `stationary-van-focus-ahead` (formerly `stationary-means-no-movement`) are **new IDs**, because the propositions changed. Other response/reason IDs, the rubric's accepted IDs and scene condition remain stable.
+3. **Clear-view control: no answer-announcing title or strawman stop.** Title is now the neutral *Near the side-street entrance* / *बगल वाली सड़क के प्रवेश के पास*; pre-lock visual conditions and base alt describe what is depicted without referring to the assessment comparison or telling the learner which region to choose. “Stop indefinitely because every side street must be blocked” was replaced by a believable horn-and-pace response. The more plausible speed-up distractor claims that passing sooner reduces exposure. For reasons, current quietness is no substitute for continued observation; faster passing does not guarantee less risk. A second legitimate rationale, `side-street-still-needs-checking`, was added to the **draft accepted reasons** alongside `open-view-still-scan`, to avoid penalising another defensible evidence-based explanation. The clear-scene rubric still explicitly accepts **none** for region recognition and both cautious responses, and does **not** imply that caution is wrong or that a visible entrance is hazard-free.
+
+### Semantic-ID change log (only where meaning changed)
+
+| Scene | Retired ID | Current ID | Content shift |
+| --- | --- | --- | --- |
+| Unfamiliar reason | `stationary-means-no-movement` | `stationary-van-focus-ahead` | Stationary-van distraction, not absolute impossibility of movement |
+| Unfamiliar reason | `centre-always-gives-room` | `centre-improves-sightline` | Conditional sightline benefit, with lane-space trade-off |
+| Clear response | `accelerate-because-clear` | `speed-up-to-pass-sooner` | Shorter exposure argument rather than obvious acceleration claim |
+| Clear response | `stop-because-any-side-street` | `horn-and-maintain-pace` | Replace implausible indefinite stop with horn-led approach |
+| Clear reason | `visible-means-no-risk` | `quiet-entrance-less-attention` | Current quietness used to deprioritise later observation |
+| Clear reason | `every-side-street-blocked` | `side-street-still-needs-checking` | A defensible reason; **added to provisional accepted IDs** |
+| Clear reason | `faster-is-easier` | `passing-faster-reduces-exposure` | Reduced-exposure assumption rather than faster-is-easier cliché |
+
+No historical attempts are migrated by B. **A must check old local records** (sceneVersion is now `1.0.1-provisional`) and ensure its existing review/replay guards reject or handle historical scenes correctly. Old option IDs that changed should not be silently reinterpreted as new claims.
+
+### Why the draft distinctions matter
+
+- **Blocked view:** the moving hazard is not known to exist, but a stationary van can screen an entrance; an apparently clear forward lane does not settle the side-entry sightline. A slight lateral change may improve visibility yet requires independent space/traffic judgement.
+- **Matched clear view:** no van obstructs the target entrance, so selecting **no relevant blocked region** is defensible, but a visible side street can still acquire cross-traffic. Both observing at a controllable pace and easing slightly remain draft-accepted. A horn is not a substitute for ongoing scanning. Two independent evidence-based reasons are accepted; simply increasing speed to “get through” is not supported by the drawing.
+- **Bus outcomes:** both endings appear **after locking** only. The response feedback references each outcome while deliberately using the same original evidence and rubric. No language guarantees crash avoidance or predicts an incident.
+
+### Review still needed
+
+A qualified India-context riding instructor must adjudicate all assessment alternatives, draft acceptance/rejection criteria and scene geometry; a Hindi-speaking reviewer must assess idiom and comprehension. In particular, review the lateral-position trade-off and whether a brief horn alongside scanning could be reasonable under some real conditions. These are condition-specific hypotheses, **not validated safety instructions**.
 
 ## Asset provenance, rights and dimensions
 

@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Authored example only: initial evidence is identical in both continuations. */
 export const busTrainingScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.0.0-provisional',
+  sceneVersion: '1.0.1-provisional',
   id: 'bus-training-01',
   purpose: 'training',
   condition: 'blocked-view',
@@ -161,20 +161,20 @@ export const busTrainingScene: SceneDefinition = {
     },
     responses: {
       'horn-hold-speed': {
-        en: 'A horn may alert someone, but it does not restore the missing view. Keeping the same speed depends on an assumption that the hidden area is clear.',
-        hi: 'हॉर्न किसी को सचेत कर सकता है, लेकिन उससे छिपा हिस्सा दिखाई नहीं देने लगता। वही रफ़्तार बनाए रखना इस अनुमान पर निर्भर करता है कि ओझल जगह खाली है।',
+        en: 'If nobody emerges, passing without incident does not prove the hidden roadside was clear when you decided; sounding the horn did not reveal it. If a pedestrian emerges, holding speed can leave less time to respond, even if the horn was heard. The original blocked view—not the ending—makes relying on the horn and unchanged speed a weak choice.',
+        hi: 'अगर कोई सामने नहीं आता, तो बिना घटना के निकल जाना यह साबित नहीं करता कि फैसला लेते समय ओझल सड़क किनारा खाली था; हॉर्न से वह हिस्सा दिखाई नहीं दिया। अगर पैदल यात्री सामने आता है, तो वही रफ़्तार बनाए रखने से प्रतिक्रिया के लिए समय कम पड़ सकता है, भले ही उसने हॉर्न सुना हो। फैसला दोनों अंतों से पहले के अधूरे दृश्य पर आधारित होना चाहिए।',
       },
       'ease-prepare-to-stop': {
-        en: 'Easing off progressively and preparing to stop leaves room to respond while visibility is incomplete. Whether and when to stop still depends on the actual road conditions.',
-        hi: 'धीरे-धीरे रफ़्तार घटाकर रुकने के लिए तैयार रहने से अधूरा दृश्य होने पर प्रतिक्रिया देने की गुंजाइश रहती है। कब और कहाँ रुकना चाहिए, यह वास्तविक सड़क की स्थिति पर निर्भर करेगा।',
+        en: 'If nobody emerges, easing off was still a response to the limited view, even if no stop proves necessary. If a pedestrian emerges, progressively reducing speed and preparing to stop may leave more time to respond; it cannot guarantee avoiding a conflict. In either ending, the choice addresses the uncertainty visible at the start, with stopping dependent on actual conditions.',
+        hi: 'अगर कोई सामने नहीं आता, तब भी रफ़्तार घटाना शुरुआती अधूरे दृश्य के अनुसार सावधानी थी, भले रुकना ज़रूरी न पड़े। अगर पैदल यात्री सामने आता है, तो धीरे-धीरे रफ़्तार घटाने और रुकने के लिए तैयार रहने से प्रतिक्रिया का ज़्यादा समय मिल सकता है; टकराव टलने की गारंटी नहीं है। दोनों अंतों में कब और कहाँ रुकना है, यह वास्तविक स्थिति पर निर्भर करेगा।',
       },
       'brief-slow-then-resume': {
-        en: 'A brief reduction does not make the concealed roadside visible. Resuming speed before the view improves can leave the original uncertainty unresolved.',
-        hi: 'थोड़ी देर रफ़्तार कम करने से ओझल सड़क किनारा दिखने नहीं लगता। दृश्य साफ़ होने से पहले फिर तेज़ होने पर शुरुआती अनिश्चितता बनी रह सकती है।',
+        en: 'If nobody emerges, getting through uneventfully does not show that it was sound to resume speed before the roadside came into view. If a pedestrian emerges, the renewed speed can reduce the time available to respond to that late appearance. In both endings, the brief slowdown alone never resolved the original visibility gap.',
+        hi: 'अगर कोई सामने नहीं आता, तब भी बिना घटना के निकलना यह साबित नहीं करता कि सड़क किनारा दिखने से पहले फिर रफ़्तार बढ़ाना उचित था। अगर पैदल यात्री सामने आता है, तो दोबारा बढ़ी रफ़्तार के कारण प्रतिक्रिया के लिए समय कम हो सकता है। दोनों अंतों में थोड़ी देर धीमे चलने से शुरुआती ओझल हिस्सा साफ़ नहीं हुआ था।',
       },
       'stay-back-reassess': {
-        en: 'Holding back and checking again avoids committing to a pass while the roadside is screened, especially with a vehicle approaching in the opposite lane.',
-        hi: 'पीछे रहकर दोबारा जाँचने से सड़क किनारा छिपा होने पर आगे निकलने का फैसला टलता है, खासकर जब विपरीत लेन से गाड़ी आ रही हो।',
+        en: 'If nobody emerges, staying back still avoids committing to a pass on an unverified view. If a pedestrian emerges, the extra separation may allow more time to notice and respond, but it does not guarantee a safe outcome. In either ending, the screened roadside and opposing traffic are reasons to reassess before passing.',
+        hi: 'अगर कोई सामने नहीं आता, तब भी पीछे रहकर जाँचना बिना पुष्टि के आगे निकलने से बचाता है। अगर पैदल यात्री सामने आता है, तो बनी हुई दूरी उसे देखने और प्रतिक्रिया देने के लिए अधिक समय दे सकती है, लेकिन सुरक्षित परिणाम की गारंटी नहीं है। दोनों अंतों में छिपा सड़क किनारा और सामने से आती गाड़ी आगे निकलने से पहले स्थिति दोबारा जाँचने के कारण हैं।',
       },
     },
     reasons: {
