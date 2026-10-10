@@ -12,7 +12,7 @@ const copy: Record<Locale, Record<string, string>> = {
     visual: 'THE SCENE', original: 'INITIAL VIEW', continuation: 'ENDING VIEW',
     observeTitle: 'Look before you decide.', observeBody: 'Study the complete scene and the visible conditions. You will make your choice on the next step.',
     visible: 'VISIBLE CONDITIONS', start: 'I’ve observed the scene', selection: 'YOUR OBSERVATION',
-    regionQuestion: 'Where would you focus your attention?', regionHint: 'Tap a marked area in the image, or use the location choices below.',
+    regionQuestion: 'Which area has blocked visibility, if any?', regionHint: 'Select the area whose view is blocked. If no area has blocked visibility, choose the explicit none option below. You can tap a marked area or use the list.',
     none: 'No relevant blocked region', answer: 'YOUR RESPONSE', reason: 'MAIN REASON',
     incomplete: 'Choose a location, a response, and a reason to continue.',
     ready: 'Your three choices are ready to lock.', lock: 'Lock my decision',
@@ -23,7 +23,7 @@ const copy: Record<Locale, Record<string, string>> = {
     ended: 'TRAINING ENDING', nextEnding: 'View the other ending', replay: 'Replay both endings',
     assessmentReview: 'There are no animated endings in independent practice.',
     startNew: 'Restart scene', next: 'Next scene', finished: 'End of available scenes',
-    noneSelected: 'No location selected', confirmed: 'Your submitted choices',
+    confirmed: 'Your submitted choices', submittedRegion: 'Area with blocked visibility', submittedResponse: 'Response chosen', submittedReason: 'Main reason chosen',
     stored: 'Local storage available', offline: 'Local storage unavailable · practice continues', corrupt: 'Local storage needs attention · practice continues',
     unchanged: 'Switch language without resetting your choices', selectable: 'SELECT A LOCATION',
     endingNotice: 'Both endings start from the same initial conditions. Neither is proof of a validated safety outcome.',
@@ -37,7 +37,7 @@ const copy: Record<Locale, Record<string, string>> = {
     visual: 'दृश्य', original: 'शुरुआती दृश्य', continuation: 'आगे का दृश्य',
     observeTitle: 'पहले ध्यान से देखें।', observeBody: 'पूरा दृश्य और दिखाई देने वाली स्थितियाँ देखें। अगला कदम आपका निर्णय है।',
     visible: 'दिखाई देने वाली स्थितियाँ', start: 'मैंने दृश्य देख लिया है', selection: 'आपका अवलोकन',
-    regionQuestion: 'आप किस जगह ध्यान देंगे?', regionHint: 'चित्र में चिह्नित हिस्से पर टैप करें या नीचे दिए गए स्थानों में से चुनें।',
+    regionQuestion: 'किस क्षेत्र में देखने में रुकावट है, यदि कहीं है?', regionHint: 'जिस क्षेत्र का दृश्य बाधित है, उसे चुनें। यदि कहीं भी देखने में रुकावट नहीं है, तो नीचे “कोई नहीं” वाला विकल्प चुनें। चित्र पर टैप करें या सूची से चुनें।',
     none: 'कोई संबंधित छिपा हुआ क्षेत्र नहीं', answer: 'आपका निर्णय', reason: 'मुख्य कारण',
     incomplete: 'आगे बढ़ने के लिए स्थान, प्रतिक्रिया और कारण चुनें।',
     ready: 'तीनों विकल्प तय हैं। अब अपना उत्तर लॉक करें।', lock: 'मेरा निर्णय लॉक करें',
@@ -48,7 +48,7 @@ const copy: Record<Locale, Record<string, string>> = {
     ended: 'प्रशिक्षण का परिणाम', nextEnding: 'दूसरा परिणाम देखें', replay: 'दोनों परिणाम फिर देखें',
     assessmentReview: 'स्वतंत्र अभ्यास में आगे के दृश्य नहीं दिखाए जाते।',
     startNew: 'नए सिरे से शुरू करें', next: 'अगला दृश्य', finished: 'उपलब्ध दृश्य पूरे हुए',
-    noneSelected: 'कोई स्थान नहीं चुना', confirmed: 'आपके दिए गए उत्तर',
+    confirmed: 'आपके दिए गए उत्तर', submittedRegion: 'बाधित दृश्य वाला क्षेत्र', submittedResponse: 'चुनी गई प्रतिक्रिया', submittedReason: 'चुना गया मुख्य कारण',
     stored: 'स्थानीय स्टोरेज उपलब्ध है', offline: 'स्थानीय स्टोरेज उपलब्ध नहीं · अभ्यास जारी रहेगा', corrupt: 'स्थानीय स्टोरेज में समस्या · अभ्यास जारी रहेगा',
     unchanged: 'भाषा बदलने पर आपके चुने हुए उत्तर नहीं बदलेंगे', selectable: 'स्थान चुनें',
     endingNotice: 'दोनों परिणाम एक जैसी शुरुआती स्थिति से शुरू होते हैं। इन्हें प्रमाणित सुरक्षा परिणाम न समझें।',
@@ -85,13 +85,22 @@ export function PracticeScreen(props: PracticeScreenProps) {
     const option = scene.reasonOptions.find((entry) => entry.id === id);
     return option ? [option] : [];
   });
-  const chosenRegionId = attempt.regionSelection?.kind === 'region' ? attempt.regionSelection.regionId : null;
-  const chosenRegion = attempt.regionSelection?.kind === 'none'
+  // Locked/review summaries must NEVER read mutable in-progress selections.
+  // The locked snapshot is the only source of submitted semantic IDs.
+  const submitted = validLock ? attempt.locked : null;
+  const submittedRegionId = submitted?.regionSelection.kind === 'region'
+    ? submitted.regionSelection.regionId : null;
+  const submittedRegionOption = scene.tapRegions.find((region) => region.id === submittedRegionId);
+  const submittedRegion = submitted?.regionSelection.kind === 'none'
     ? tr(scene.noneLabel, locale)
-    : tr(scene.tapRegions.find((region) => region.id === chosenRegionId)?.label ??
-      { en: t.noneSelected, hi: copy.hi.noneSelected }, locale);
-  const chosenResponse = scene.responseOptions.find((option) => option.id === attempt.responseId);
-  const chosenReason = scene.reasonOptions.find((option) => option.id === attempt.reasonId);
+    : submittedRegionOption ? tr(submittedRegionOption.label, locale) : '—';
+  const submittedResponse = scene.responseOptions.find((option) => option.id === submitted?.responseId);
+  const submittedReason = scene.reasonOptions.find((option) => option.id === submitted?.reasonId);
+  const submittedChoices = submitted ? [
+    { label: t.submittedRegion, value: submittedRegion },
+    { label: t.submittedResponse, value: submittedResponse ? tr(submittedResponse.label, locale) : '—' },
+    { label: t.submittedReason, value: submittedReason ? tr(submittedReason.label, locale) : '—' },
+  ] : [];
   const storageLabel = storageStatus === 'available' ? t.stored : storageStatus === 'corrupt' ? t.corrupt : t.offline;
   const phaseStep = isObserving ? 0 : isAnswering ? 1 : 2;
   const allTrainingEndingsSeen = scene.purpose !== 'training' ||
@@ -194,13 +203,24 @@ export function PracticeScreen(props: PracticeScreenProps) {
               <div className="bs-action-overline"><span className="bs-small-square" /> {t.lockedTag}</div>
               <div className="bs-lock-symbol" aria-hidden="true">✓</div>
               <h2>{t.lockedTitle}</h2><p className="bs-action-description">{t.lockedBody}</p>
-              <div className="bs-summary"><h3>{t.confirmed}</h3><p>{chosenRegion}</p><p>{chosenResponse ? tr(chosenResponse.label, locale) : '—'}</p><p>{chosenReason ? tr(chosenReason.label, locale) : '—'}</p></div>
+              {submitted && <section className="bs-summary" aria-label={t.confirmed}>
+                <h3>{t.confirmed}</h3>
+                <dl className="bs-submitted-list">{submittedChoices.map(({ label, value }) =>
+                  <div className="bs-submitted-item" key={label}><dt>{label}</dt><dd>{value}</dd></div>
+                )}</dl>
+              </section>}
               <div className="bs-panel-footer"><button type="button" className="bs-primary" onClick={onStartReview}>{t.seeReview}<span aria-hidden="true">↗</span></button></div>
             </>}
 
             {isReview && <>
               <div className="bs-action-overline"><span className="bs-small-square" /> 03 / {t.review}</div>
               <h2>{t.reviewTitle}</h2><p className="bs-action-description">{t.reviewHint}</p>
+              {canReview && submitted && <section className="bs-summary bs-summary--review" aria-label={t.confirmed}>
+                <h3>{t.confirmed}</h3>
+                <dl className="bs-submitted-list">{submittedChoices.map(({ label, value }) =>
+                  <div className="bs-submitted-item" key={label}><dt>{label}</dt><dd>{value}</dd></div>
+                )}</dl>
+              </section>}
               {canReview && feedback ? <div className="bs-feedback">
                 <article><span className="bs-feedback-number">01</span><div><h3>{t.recognition}</h3><p>{feedback.recognition}</p></div></article>
                 <article><span className="bs-feedback-number">02</span><div><h3>{t.responseNote}</h3><p>{feedback.response}</p></div></article>

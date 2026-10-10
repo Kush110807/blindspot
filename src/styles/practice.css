@@ -110,7 +110,11 @@
 .bs-lock-symbol {width:62px;height:62px;border:1px solid #638762;background:#25432f;color:var(--bs-lime);font-size:27px;border-radius:16px;display:grid;place-items:center;margin:16px 0 23px}
 .bs-summary {background:#101c26;border:1px solid #304653;border-radius:10px;padding:19px;margin-bottom:18px}
 .bs-summary h3 {font-size:11px;letter-spacing:.12em;color:var(--bs-lime);margin:0 0 13px}
-.bs-summary p {padding:10px 0;border-top:1px solid #293c49;color:#cbd9dd;font-size:12px;margin:0}
+.bs-summary--review {margin-bottom:23px}
+.bs-submitted-list {margin:0}
+.bs-submitted-item {padding:10px 0;border-top:1px solid #293c49}
+.bs-submitted-item dt {color:#94b0bb;font-size:10px;font-weight:780;letter-spacing:.04em;margin-bottom:5px}
+.bs-submitted-item dd {margin:0;color:#eef5f0;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
 .bs-feedback {display:grid;gap:14px;margin-bottom:24px}
 .bs-feedback article {display:flex;gap:12px;padding-bottom:15px;border-bottom:1px solid #273b47}
 .bs-feedback-number {color:var(--bs-lime);font-size:10px;font-weight:850;padding-top:4px}
