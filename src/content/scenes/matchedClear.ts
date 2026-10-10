@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Matched composition to unfamiliar-blocked-01, without the stationary van. */
 export const matchedClearScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.1.0-provisional',
+  sceneVersion: '1.2.0-provisional',
   id: 'matched-clear-01',
   purpose: 'assessment',
   condition: 'clear-view-control',
@@ -35,7 +35,7 @@ export const matchedClearScene: SceneDefinition = {
     {
       id: 'open-right-entry',
       label: { en: 'Area at the right-hand side-street entrance', hi: 'दाईं ओर की जोड़ने वाली सड़क का प्रवेश' },
-      bounds: { x: 0.77, y: 0.27, width: 0.17, height: 0.25 },
+      bounds: { x: 0.773, y: 0.270, width: 0.167, height: 0.247 },
     },
     {
       id: 'far-left-vehicle',

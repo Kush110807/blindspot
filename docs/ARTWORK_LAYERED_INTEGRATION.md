@@ -1,3 +1,5 @@
+> Superseded by [ARTWORK_FINAL_SOURCE_VERIFICATION.md](ARTWORK_FINAL_SOURCE_VERIFICATION.md) for scene version 1.2.0; retained to document earlier 1.1.0 candidate.
+
 # Scene artwork: layered revision 1.1.0-provisional
 
 ## Asset provenance and control

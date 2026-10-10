@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Authored example only: initial evidence is identical in both continuations. */
 export const busTrainingScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.1.0-provisional',
+  sceneVersion: '1.2.0-provisional',
   id: 'bus-training-01',
   purpose: 'training',
   condition: 'blocked-view',
@@ -41,7 +41,7 @@ export const busTrainingScene: SceneDefinition = {
         en: 'Space beside and beyond the far edge of the bus',
         hi: 'बस के अगले किनारे के पास और उसके आगे की जगह',
       },
-      bounds: { x: 0.445, y: 0.305, width: 0.11, height: 0.255 },
+      bounds: { x: 0.438, y: 0.285, width: 0.115, height: 0.235 },
     },
     {
       id: 'lane-directly-ahead',
@@ -51,7 +51,7 @@ export const busTrainingScene: SceneDefinition = {
     {
       id: 'opposite-lane-vehicle',
       label: { en: 'Vehicle in the opposite lane', hi: 'विपरीत लेन की गाड़ी' },
-      bounds: { x: 0.60, y: 0.31, width: 0.14, height: 0.18 },
+      bounds: { x: 0.602, y: 0.313, width: 0.142, height: 0.192 },
     },
     {
       id: 'near-left-pavement',

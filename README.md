@@ -78,3 +78,7 @@ The integrated application now leads locked review with a choice-specific takeaw
 ## Layered artwork review (independent acceptance pending)
 
 The bus base and pedestrian are frozen after artwork approval; the pedestrian remains a post-lock overlay. The clear assessment street is the unaltered pixel background for the blocked view; only the separately stored van/shadow overlay changes the blocked image. `schemaVersion` remains 1 and scene IDs/response IDs/reason IDs are stable; all three `sceneVersion` values are now `1.1.0-provisional` to prevent reuse of older image evidence. See `docs/ARTWORK_LAYERED_INTEGRATION.md` and run `python scripts/verify-artwork.py` with Pillow and NumPy installed for strict pixel comparison. The real React/Vite rendering has **not** been verified in this environment while npm dependencies are unavailable.
+
+## Final artwork source verification (pending running-app QA)
+
+The 1.2.0-provisional imagery is restored from the approved PDF sources. The bus base is shared by both training endings; the pedestrian is a transparent post-lock overlay. The blocked assessment is an exact alpha composition of the frozen clear-junction background with the van/shadow layer. Run `python scripts/verify-artwork.py` (Pillow and NumPy required) to confirm source SHA-256 pixel hashes and zero changes outside the overlay. See `docs/ARTWORK_FINAL_SOURCE_VERIFICATION.md`. Browser acceptance on desktop and 375px has **not** been completed in this sandbox.

@@ -18,7 +18,7 @@ test('revised scenes preserve stable IDs, unvalidated status and schema but bump
   assert.deepEqual(scenes.map(s => s.id), ['bus-training-01', 'unfamiliar-blocked-01', 'matched-clear-01']);
   for (const scene of scenes) {
     assert.equal(scene.schemaVersion, 1);
-    assert.equal(scene.sceneVersion, '1.1.0-provisional');
+    assert.equal(scene.sceneVersion, '1.2.0-provisional');
     assert.equal(scene.contentReview.status, 'provisional');
     assert.deepEqual(validateScene(scene), []);
     assert.deepEqual(pngDimensions(scene.base.src), { width: scene.base.width, height: scene.base.height });
@@ -48,4 +48,28 @@ test('matched scenes expose the same viewport geometry; blocked scene alone has 
   const clearOptions = scenes[2].responseOptions.map(o => o.id);
   assert.equal(new Set(blockedOptions).size, blockedOptions.length);
   assert.equal(new Set(clearOptions).size, clearOptions.length);
+});
+
+
+test('final PDF-sourced tap areas stay within normalized viewport and distinguish blocked and clear junctions', () => {
+  const bus = scenes[0];
+  const blocked = scenes[1];
+  const clear = scenes[2];
+  for (const scene of scenes) {
+    for (const region of scene.tapRegions) {
+      const b = region.bounds;
+      assert.ok(b.x >= 0 && b.y >= 0 && b.width > 0 && b.height > 0);
+      assert.ok(b.x + b.width <= 1 && b.y + b.height <= 1);
+    }
+  }
+  const busHidden = bus.tapRegions.find(r => r.id === 'space-beyond-bus')!.bounds;
+  const opposing = bus.tapRegions.find(r => r.id === 'opposite-lane-vehicle')!.bounds;
+  const vanScreen = blocked.tapRegions.find(r => r.id === 'beside-delivery-van')!.bounds;
+  const openEntry = clear.tapRegions.find(r => r.id === 'open-right-entry')!.bounds;
+  assert.ok(busHidden.x < opposing.x, 'bus-side hidden hazard is left of opposing SUV');
+  assert.ok(vanScreen.x < openEntry.x, 'occluding van forward edge lies left of open side-road approach');
+  assert.notDeepEqual(vanScreen, openEntry);
+  assert.equal(blocked.rubric.acceptedRegionIds[0], 'beside-delivery-van');
+  assert.deepEqual(clear.rubric.acceptedRegionIds, []);
+  assert.equal(clear.rubric.acceptsNone, true);
 });
