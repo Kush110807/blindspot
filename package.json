@@ -8,12 +8,13 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/prepare-static.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "check": "npm run test && npm run build",
-    "verify:repo": "node scripts/verify-repo.mjs"
+    "verify:repo": "node scripts/verify-repo.mjs",
+    "verify:static": "node scripts/prepare-static.mjs"
   },
   "dependencies": {
     "react": "18.3.1",

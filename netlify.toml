@@ -1,0 +1,22 @@
+# Root-of-domain static hosting. BlindSpot deliberately uses /scenes/* and
+# /favicon.* root-relative URLs; deploying to a URL subpath needs a separate review.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22.16.0"
+
+# No client-side URL router today, but retain a safe SPA fallback for reloads.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers do not load external code or change learner state.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
