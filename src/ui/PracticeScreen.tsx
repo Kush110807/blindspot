@@ -3,6 +3,7 @@ import type { Locale, Translated } from '../contracts/scene.ts';
 import { translate } from '../contracts/scene.ts';
 import { canLock } from '../engine/attempt.ts';
 import { SceneViewport } from './SceneViewport.tsx';
+import { summarizeReviewTone } from './reviewTone.ts';
 import { buildLessonPresentation, regionSelectionForViewport, type LessonDisposition } from '../integration/lessonPresentation.ts';
 import '../styles/practice.css';
 
@@ -53,6 +54,13 @@ const copy: Record<Locale, Record<string, string>> = {
     noChange: 'Your action is draft-supported. Keep adapting as you approach, and address any recognition or reasoning gaps shown above.',
     improveCriterion: 'How to improve this part',
     nextScene: 'Continue to next scene', seenBoth: 'View both endings to continue',
+    keepDoing: 'What to keep doing', submissionNeutral: 'Submitted, not scored',
+    yourDecision: 'Your submitted decision', visualReview: 'Scene and outcome',
+    assessmentScene: 'Initial assessment scene', feedbackGroup: 'Feedback by criterion',
+    lessonDetails: 'More lesson context and draft alternatives', storageDetail: 'Storage details',
+    statusMixed: 'Mixed choices', statusSupported: 'Draft-supported overall',
+    statusConditional: 'Conditions matter', statusReconsider: 'Reconsider the decision',
+    detailIntro: 'Additional context', outcomeNoGuarantee: 'The ending does not determine whether the original choice was justified.',
   },
   hi: {
     brandSub: 'जो दिखाई नहीं देता, उसे समझें', training: 'निर्देशित अभ्यास', assessment: 'स्वतंत्र अभ्यास',
@@ -100,6 +108,13 @@ const copy: Record<Locale, Record<string, string>> = {
     noChange: 'आपका कदम इस प्रारंभिक पाठ में समर्थित है। पास आते समय स्थिति देखते रहें और ऊपर बताई गई पहचान या कारण की कमी भी सुधारें।',
     improveCriterion: 'इस हिस्से को कैसे सुधारें',
     nextScene: 'अगले दृश्य पर जाएँ', seenBoth: 'आगे जाने से पहले दोनों अंत देखें',
+    keepDoing: 'आगे भी क्या करते रहें', submissionNeutral: 'उत्तर दर्ज हुआ, अंक नहीं मिले',
+    yourDecision: 'आपका दर्ज किया गया निर्णय', visualReview: 'दृश्य और परिणाम',
+    assessmentScene: 'मूल अभ्यास दृश्य', feedbackGroup: 'हर हिस्से पर प्रतिक्रिया',
+    lessonDetails: 'अधिक संदर्भ और प्रारंभिक विकल्प', storageDetail: 'संग्रह की जानकारी',
+    statusMixed: 'मिश्रित विकल्प', statusSupported: 'मसौदे में समर्थित',
+    statusConditional: 'परिस्थितियाँ महत्त्वपूर्ण हैं', statusReconsider: 'निर्णय पर फिर विचार करें',
+    detailIntro: 'अधिक जानकारी', outcomeNoGuarantee: 'अंत के आधार पर शुरुआती निर्णय को सही या गलत नहीं माना जा सकता।',
   },
 };
 
@@ -153,6 +168,10 @@ export function PracticeScreen(props: PracticeScreenProps) {
   const canContinue = canNextScene && allTrainingEndingsSeen;
   const lesson = canReview ? buildLessonPresentation(scene, submitted, locale, currentEnding?.id ?? null) : null;
   const statusText = (status: LessonDisposition) => status === 'supported' ? t.supported : status === 'conditional' ? t.conditional : t.reconsider;
+  // Styling is derived from all three provisional criteria. A supported action alone
+  // must never turn an otherwise mixed/reconsideration review green.
+  const overallPresentation = lesson
+    ? summarizeReviewTone(lesson.recognition, lesson.response, lesson.reason) : 'reconsider';
   const compactCriterion = (criterion: 'recognition' | 'response' | 'reason') => {
     if (!lesson) return '';
     if (criterion === 'recognition') return lesson.recognition === 'supported' ? t.recognitionMatches : t.recognitionDiffers;
@@ -160,182 +179,174 @@ export function PracticeScreen(props: PracticeScreenProps) {
     return lesson.response === 'supported' ? t.responseMatches : lesson.response === 'conditional' ? t.responseDepends : t.responseDiffers;
   };
 
+  const statusOverall = overallPresentation === 'supported' ? t.statusSupported :
+    overallPresentation === 'conditional' ? t.statusConditional :
+    overallPresentation === 'mixed' ? t.statusMixed : t.statusReconsider;
+  const showStorageWarning = storageStatus !== 'available';
+  const immediateGuidance = !lesson ? '' : overallPresentation === 'supported' ? t.noChange :
+    lesson.response === 'supported'
+      ? [lesson.recognitionRemediation, lesson.reasonRemediation].filter((value): value is string => Boolean(value)).join(' ')
+      : lesson.response === 'conditional' ? `${lesson.responseMeaning} ${lesson.nextStep}` : lesson.nextStep;
+
+  const scenePanel = (
+    <section className="bs-scene-panel" aria-label={t.visual}>
+      <div className="bs-panel-head">
+        <span>{currentEnding ? tr(currentEnding.title, locale) : t.visual}</span>
+        <span className="bs-panel-subtle">{currentEnding ? t.continuation : t.original}</span>
+      </div>
+      <SceneViewport scene={scene} locale={locale} selected={regionSelectionForViewport(scene, attempt)}
+        canSelect={isAnswering} ending={currentEnding} review={canReview} onSelectRegion={onSelectRegion}/>
+      {isAnswering && <p className="bs-map-caption">{t.regionHelp}</p>}
+      {canReview && lesson && <div className="bs-region-comparison" data-testid="region-comparison">
+        <h3>{t.regionCompare}</h3>
+        <dl><div><dt><span className="bs-marked-dot"/>{t.markedArea}</dt><dd>{lesson.selectedRegion}</dd></div>
+          <div><dt><span className="bs-target-dot"/>{t.focusArea}</dt><dd>{lesson.expectedRegion}</dd></div></dl>
+        <p>{lesson.regionExplanation}</p>
+        {scene.condition === 'clear-view-control' && <p className="bs-clear-note">{t.clearNone}</p>}
+      </div>}
+      {!canReview && <div className="bs-conditions">
+        <h2>{t.visible}</h2>
+        <ul>{scene.visibleConditions.map((condition, index) => <li key={index}>{tr(condition, locale)}</li>)}</ul>
+      </div>}
+    </section>
+  );
+
   return (
-    <div className={`bs-app${canReview ? ' bs-app--review' : ''}`} lang={locale}>
-      <div className="bs-ambient bs-ambient--one" aria-hidden="true" />
-      <div className="bs-ambient bs-ambient--two" aria-hidden="true" />
-      <header className="bs-topbar">
-        <div className="bs-topbar-inner">
-          <div className="bs-brand" aria-label="BlindSpot">
-            <span className="bs-brand-icon" aria-hidden="true"><span /></span>
-            <span><strong>BLIND<span>SPOT</span></strong><small>{t.brandSub}</small></span>
-          </div>
-          <div className="bs-topbar-tools">
-            <span className="bs-topbar-mode">{scene.purpose === 'training' ? t.training : t.assessment}</span>
-            <div className="bs-lang" role="group" aria-label={t.unchanged}>
-              <button type="button" className={locale === 'en' ? 'bs-lang-active' : ''} aria-pressed={locale === 'en'} onClick={() => onLocaleChange('en')}>EN</button>
-              <button type="button" className={locale === 'hi' ? 'bs-lang-active' : ''} aria-pressed={locale === 'hi'} onClick={() => onLocaleChange('hi')}>हिं</button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className={`bs-app bs-phase--${attempt.phase}${canReview ? ' bs-app--review' : ''}`} lang={locale}>
+      <header className="bs-topbar"><div className="bs-topbar-inner">
+        <div className="bs-brand" aria-label="BlindSpot"><span className="bs-brand-icon" aria-hidden="true"><span/></span>
+          <span><strong>BlindSpot</strong><small>{t.brandSub}</small></span></div>
+        <div className="bs-topbar-tools"><span className="bs-topbar-mode">{scene.purpose === 'training' ? t.training : t.assessment}</span>
+          <div className="bs-lang" role="group" aria-label={t.unchanged}>
+            <button type="button" className={locale === 'en' ? 'bs-lang-active' : ''} aria-pressed={locale === 'en'} onClick={() => onLocaleChange('en')}>EN</button>
+            <button type="button" className={locale === 'hi' ? 'bs-lang-active' : ''} aria-pressed={locale === 'hi'} onClick={() => onLocaleChange('hi')}>हिंदी</button>
+          </div></div></div></header>
       <main className="bs-main">
-        <div className="bs-progress" aria-label={`${t.module}: ${[t.observe, t.decide, t.review][phaseStep]}`}>
-          {[t.observe, t.decide, t.review].map((step, index) => (
-            <div className={`bs-step${index === phaseStep ? ' bs-step--active' : ''}${index < phaseStep ? ' bs-step--done' : ''}`} key={index}
-              aria-current={index === phaseStep ? 'step' : undefined}>
-              <span className="bs-step-number">{index < phaseStep ? '✓' : `0${index + 1}`}</span>
-              <span>{step}</span>
-            </div>
-          ))}
-        </div>
+        <nav className="bs-progress" aria-label={`${t.module}: ${[t.observe, t.decide, t.review][phaseStep]}`}>
+          {[t.observe, t.decide, t.review].map((step, index) => <div key={index}
+            className={`bs-step${index === phaseStep ? ' bs-step--active' : ''}${index < phaseStep ? ' bs-step--done' : ''}`}
+            aria-current={index === phaseStep ? 'step' : undefined}>
+            <span className="bs-step-number">{index < phaseStep ? '✓' : index + 1}</span>{step}</div>)}
+        </nav>
+        <div className="bs-intro"><div><p className="bs-kicker">{scene.purpose === 'training' ? t.training : t.assessment}</p>
+          <h1>{tr(scene.title, locale)}</h1>
+          <p>{canReview ? t.reviewHint : tr(scene.prompt, locale)}</p></div></div>
 
-        <div className="bs-intro">
-          <div className="bs-intro-text">
-            <span className="bs-kicker"><span className="bs-kicker-line" /> {t.module} <span className="bs-kicker-divider">/</span> {scene.purpose === 'training' ? t.training : t.assessment}</span>
-            <h1>{tr(scene.title, locale)}</h1>
-            <p>{canReview ? t.reviewHint : tr(scene.prompt, locale)}</p>
-          </div>
-          <span className="bs-status-badge"><span />{isReview ? t.reviewedTag : isLocked ? t.lockedTag : scene.purpose === 'training' ? t.training : t.assessment}</span>
-        </div>
-
-        {canReview && lesson && <section className="bs-review-lead" aria-label={t.keyTakeaway}>
-          <p className="bs-review-eyebrow">{t.draftComparison}</p>
-          <h2>{t.keyTakeaway}</h2>
-          <p className="bs-review-takeaway" data-testid="review-takeaway">{lesson.takeaway}</p>
-        </section>}
-        <div className="bs-workspace">
-          <section className="bs-scene-panel" aria-label={t.visual}>
-            <div className="bs-panel-head"><span className="bs-panel-kicker"><span className="bs-panel-dot" /> {t.visual}</span><span className="bs-panel-subtle">{currentEnding ? t.continuation : t.original}</span></div>
-            <SceneViewport scene={scene} locale={locale} selected={regionSelectionForViewport(scene, attempt)} canSelect={isAnswering}
-              ending={currentEnding} review={canReview} onSelectRegion={onSelectRegion} />
-            {isAnswering && <p className="bs-map-caption"><span aria-hidden="true">◎</span> {t.regionHelp}</p>}
-            {canReview && lesson && <div className="bs-region-comparison" data-testid="region-comparison">
-              <h3>{t.regionCompare}</h3>
-              <dl><div><dt><span className="bs-marked-dot" />{t.markedArea}</dt><dd>{lesson.selectedRegion}</dd></div>
-              <div><dt><span className="bs-target-dot" />{t.focusArea}</dt><dd>{lesson.expectedRegion}</dd></div></dl>
-              <p>{lesson.regionExplanation}</p>
-              {scene.condition === 'clear-view-control' && <p className="bs-clear-note">{t.clearNone}</p>}
-            </div>}
-            <div className="bs-conditions">
-              <div className="bs-conditions-head"><span className="bs-list-index">01</span><h2>{t.visible}</h2></div>
-              <ul>{scene.visibleConditions.map((condition, index) => <li key={index}><span className="bs-condition-bullet" />{tr(condition, locale)}</li>)}</ul>
+        {canReview && lesson && <>
+          <section className={`bs-review-lead bs-review-lead--${overallPresentation}`} aria-label={t.keyTakeaway}>
+            <div className="bs-review-lead-top"><span className="bs-overall-label" data-testid="overall-presentation">{statusOverall}</span>
+</div>
+            <h2>{t.keyTakeaway}</h2>
+            <p className="bs-review-takeaway" data-testid="review-takeaway">{lesson.takeaway}</p>
+            <div className="bs-immediate-step" data-testid="immediate-improvement">
+              <h3>{overallPresentation === 'supported' ? t.keepDoing : t.change}</h3>
+              <p>{immediateGuidance}</p>
             </div>
           </section>
+          <section className="bs-review-scene" aria-label={t.visualReview}>
+            <h2>{t.visualReview}</h2>
+            <div className="bs-review-scene-grid">
+              {scenePanel}
+              <div className="bs-review-outcome">
+                {currentEnding ? <section className="bs-ending-card" data-testid="ending-review">
+                  <div className="bs-ending-label">{t.ended} · {attempt.endingIndex + 1} / {scene.continuations.length}</div>
+                  <h3>{tr(currentEnding.title, locale)}</h3>
+                  {lesson.endingMessage && <p className="bs-ending-takeaway">{lesson.endingMessage}</p>}
+                  <details className="bs-expand"><summary>{t.continuationDetails}</summary>
+                    <p>{tr(currentEnding.narrative, locale)}</p><p>{t.outcomeNoGuarantee}</p>
+                  </details>
+                  {attempt.endingIndex < scene.continuations.length - 1 && <button type="button" className="bs-primary" onClick={onNextEnding}>
+                    {t.nextEnding}<span aria-hidden="true">→</span></button>}
+                  {attempt.endingIndex === scene.continuations.length - 1 && <button type="button" className="bs-secondary" onClick={onReplayEndings}>
+                    {t.replay}<span aria-hidden="true">↺</span></button>}
+                </section> : <section className="bs-assessment-info">
+                  <h3>{t.assessmentScene}</h3><p>{t.assessmentReview}</p>
+                  <h3>{t.visible}</h3><ul>{scene.visibleConditions.map((condition, index) => <li key={index}>{tr(condition, locale)}</li>)}</ul>
+                </section>}
+              </div>
+            </div>
+          </section>
+          <section className="bs-review-feedback" aria-label={t.feedbackGroup}>
+            <h2>{t.feedbackGroup}</h2>
+            <div className="bs-criteria">
+              {([['recognition', t.observationLabel], ['response', t.responseLabel], ['reason', t.reasoningLabel]] as const)
+                .map(([criterion, label]) => <article className={`bs-criterion bs-criterion--${lesson[criterion]}`} key={criterion} data-testid={`criterion-${criterion}`}>
+                  <div className="bs-criterion-heading"><h3>{label}</h3>
+                    <span className={`bs-criterion-status bs-criterion-status--${lesson[criterion]}`}>{statusText(lesson[criterion])}</span></div>
+                  <p>{compactCriterion(criterion)}</p>
+                  {criterion === 'recognition' && lesson.recognitionRemediation && <div className="bs-criterion-remediation" data-testid="recognition-remediation">
+                    <strong>{t.improveCriterion}</strong><p>{lesson.recognitionRemediation}</p></div>}
+                  {criterion === 'reason' && lesson.reasonRemediation && <div className="bs-criterion-remediation" data-testid="reason-remediation">
+                    <strong>{t.improveCriterion}</strong><p>{lesson.reasonRemediation}</p></div>}
+                </article>)}
+            </div>
+            <section className="bs-review-choices" aria-label={t.yourDecision}>
+              <h3>{t.yourDecision}</h3>
+              <dl>{submittedChoices.map(({ label, value }) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+            </section>
+            <details className="bs-expand bs-review-extra"><summary>{t.lessonDetails}</summary>
+              <h3>{t.itsMeaning}</h3><p>{lesson.responseMeaning}</p>
+              <h3>{t.whyBetter}</h3><p>{lesson.why}</p>
+              <h3>{t.alternatives}</h3><ul>{lesson.alternatives.map((option) => <li key={option}>{option}</li>)}</ul>
+              {feedback && <div className="bs-detailed-feedback">
+                <p><strong>{t.observationLabel}:</strong> {feedback.recognition}</p>
+                <p><strong>{t.responseLabel}:</strong> {feedback.response}</p>
+                <p><strong>{t.reasoningLabel}:</strong> {feedback.reason}</p></div>}
+            </details>
+          </section>
+          <div className="bs-provisional" role="note"><span aria-hidden="true">ⓘ</span> {t.draft}</div>
+          <div className="bs-review-controls">
+            {canContinue && <button type="button" className="bs-primary" onClick={onNextScene}>{t.nextScene}<span aria-hidden="true">→</span></button>}
+            {scene.condition === 'clear-view-control' && !canNextScene && <section className="bs-completed" data-testid="practice-completed">
+              <h2>{t.complete}</h2><p>{t.completionHelp}</p></section>}
+            {canNextScene && !allTrainingEndingsSeen && <p className="bs-next-hint">{t.seenBoth}</p>}
+            <button type="button" className="bs-secondary" onClick={onRestart}>{t.tryAgain}<span aria-hidden="true">↺</span></button>
+          </div>
+        </>}
 
+        {!canReview && <div className="bs-workspace">
+          {scenePanel}
           <section className="bs-action-panel" aria-live="polite" aria-label={[t.observe, t.decide, t.review][phaseStep]}>
             {isObserving && <>
-              <div className="bs-action-overline"><span className="bs-small-square" /> 01 / {t.observe}</div>
-              <h2>{t.observeTitle}</h2>
-              <p className="bs-action-description">{t.observeBody}</p>
-
-              <div className="bs-panel-footer"><button type="button" className="bs-primary" onClick={onBegin}>{t.start}<span aria-hidden="true">↗</span></button></div>
+              <h2>{t.observeTitle}</h2><p className="bs-action-description">{t.observeBody}</p>
+              <button type="button" className="bs-primary bs-observe-cta" onClick={onBegin}>{t.start}<span aria-hidden="true">→</span></button>
             </>}
-
             {isAnswering && <>
-              <div className="bs-action-overline"><span className="bs-small-square" /> 02 / {t.selection}</div>
-              <h2>{t.regionQuestion}</h2>
-              <p className="bs-action-description">{t.regionHint}</p>
-              <div className="bs-field"><div className="bs-field-title"><span>01</span><h3>{t.selectable}</h3>{attempt.regionSelection && <span className="bs-selected-dot" aria-label="selected">✓</span>}</div>
+              <h2>{t.regionQuestion}</h2><p className="bs-action-description">{t.regionHint}</p>
+              <div className="bs-field"><h3>{t.selectable}</h3>
                 <div className="bs-region-options" role="group" aria-label={t.selectable}>
-                  {scene.tapRegions.map((region) => <button type="button" key={region.id}
-                    className={`bs-region-option${attempt.regionSelection?.kind === 'region' && attempt.regionSelection.regionId === region.id ? ' bs-option--selected' : ''}`}
+                  {scene.tapRegions.map((region) => <button type="button" key={region.id} className={`bs-region-option${attempt.regionSelection?.kind === 'region' && attempt.regionSelection.regionId === region.id ? ' bs-option--selected' : ''}`}
                     aria-pressed={attempt.regionSelection?.kind === 'region' && attempt.regionSelection.regionId === region.id}
-                    onClick={() => onSelectRegion({ kind: 'region', regionId: region.id })}><span className="bs-option-radio" />{tr(region.label, locale)}</button>)}
+                    onClick={() => onSelectRegion({kind:'region',regionId:region.id})}><span className="bs-option-radio" aria-hidden="true" />{tr(region.label,locale)}</button>)}
                   <button type="button" className={`bs-region-option bs-none-option${attempt.regionSelection?.kind === 'none' ? ' bs-option--selected' : ''}`}
-                    aria-pressed={attempt.regionSelection?.kind === 'none'} onClick={() => onSelectRegion({ kind: 'none' })}>
-                    <span className="bs-option-radio" />{tr(scene.noneLabel, locale)}</button>
-                </div>
-              </div>
-              <div className="bs-field"><div className="bs-field-title"><span>02</span><h3>{t.answer}</h3>{attempt.responseId && <span className="bs-selected-dot" aria-label="selected">✓</span>}</div>
-                <div className="bs-choice-options" role="group" aria-label={t.answer}>
-                  {orderedResponses.map((option) => <button type="button" className={`bs-choice-option${attempt.responseId === option.id ? ' bs-option--selected' : ''}`}
-                    key={option.id} aria-pressed={attempt.responseId === option.id} onClick={() => onSelectResponse(option.id)}><span className="bs-option-radio" />{tr(option.label, locale)}</button>)}
-                </div>
-              </div>
-              <div className="bs-field"><div className="bs-field-title"><span>03</span><h3>{t.reason}</h3>{attempt.reasonId && <span className="bs-selected-dot" aria-label="selected">✓</span>}</div>
-                <div className="bs-choice-options" role="group" aria-label={t.reason}>
-                  {orderedReasons.map((option) => <button type="button" className={`bs-choice-option${attempt.reasonId === option.id ? ' bs-option--selected' : ''}`}
-                    key={option.id} aria-pressed={attempt.reasonId === option.id} onClick={() => onSelectReason(option.id)}><span className="bs-option-radio" />{tr(option.label, locale)}</button>)}
-                </div>
-              </div>
-              <div className="bs-panel-footer"><p className="bs-action-help" aria-live="polite">{canLock(attempt) ? t.ready : t.incomplete}</p>
-                <button type="button" className="bs-primary" onClick={onLock} disabled={!canLock(attempt)}>{t.lock}<span aria-hidden="true">↗</span></button></div>
+                    aria-pressed={attempt.regionSelection?.kind === 'none'} onClick={() => onSelectRegion({kind:'none'})}><span className="bs-option-radio" aria-hidden="true" />{tr(scene.noneLabel,locale)}</button>
+                </div></div>
+              <div className="bs-field"><h3>{t.answer}</h3><div className="bs-choice-options" role="group" aria-label={t.answer}>
+                {orderedResponses.map((option) => <button type="button" className={`bs-choice-option${attempt.responseId === option.id ? ' bs-option--selected' : ''}`}
+                  key={option.id} aria-pressed={attempt.responseId === option.id} onClick={() => onSelectResponse(option.id)}><span className="bs-option-radio" aria-hidden="true" />{tr(option.label,locale)}</button>)}</div></div>
+              <div className="bs-field"><h3>{t.reason}</h3><div className="bs-choice-options" role="group" aria-label={t.reason}>
+                {orderedReasons.map((option) => <button type="button" className={`bs-choice-option${attempt.reasonId === option.id ? ' bs-option--selected' : ''}`}
+                  key={option.id} aria-pressed={attempt.reasonId === option.id} onClick={() => onSelectReason(option.id)}><span className="bs-option-radio" aria-hidden="true" />{tr(option.label,locale)}</button>)}</div></div>
+              <div className="bs-answer-submit"><p aria-live="polite">{canLock(attempt) ? t.ready : t.incomplete}</p>
+                <button type="button" className="bs-primary" onClick={onLock} disabled={!canLock(attempt)}>{t.lock}<span aria-hidden="true">→</span></button></div>
             </>}
-
             {isLocked && <>
-              <div className="bs-action-overline"><span className="bs-small-square" /> {t.lockedTag}</div>
-              <div className="bs-lock-symbol" aria-hidden="true">✓</div>
+              <div className="bs-locked-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
               <h2>{t.lockedTitle}</h2><p className="bs-action-description">{t.lockedBody}</p>
+              <span className="bs-lock-neutral">{t.submissionNeutral}</span>
               {submitted && <section className="bs-summary" aria-label={t.confirmed}>
-                <h3>{t.confirmed}</h3>
-                <dl className="bs-submitted-list">{submittedChoices.map(({ label, value }) =>
-                  <div className="bs-submitted-item" key={label}><dt>{label}</dt><dd>{value}</dd></div>
-                )}</dl>
+                <h3>{t.confirmed}</h3><dl>{submittedChoices.map(({label,value}) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
               </section>}
-              <div className="bs-panel-footer"><button type="button" className="bs-primary" onClick={onStartReview}>{t.seeReview}<span aria-hidden="true">↗</span></button></div>
+              <button type="button" className="bs-primary" onClick={onStartReview}>{t.seeReview}<span aria-hidden="true">→</span></button>
             </>}
-
-            {isReview && <>
-              <div className="bs-action-overline"><span className="bs-small-square" /> 03 / {t.review}</div>
-              {canReview && lesson && submitted && feedback ? <>
-                <section className="bs-review-choices" aria-label={t.yourChoice}>
-                  <h2>{t.yourChoice}</h2>
-                  <dl className="bs-submitted-list">{submittedChoices.map(({ label, value }) =>
-                    <div className="bs-submitted-item" key={label}><dt>{label}</dt><dd>{value}</dd></div>
-                  )}</dl>
-                </section>
-                <section className="bs-criteria" aria-label={t.reviewTitle}>
-                  <h2>{t.reviewTitle}</h2>
-                  {([['recognition', t.observationLabel],
-                     ['response', t.responseLabel],
-                     ['reason', t.reasoningLabel]] as const).map(([criterion, name]) =>
-                    <article key={criterion} data-testid={`criterion-${criterion}`}>
-                      <div className="bs-criterion-heading"><h3>{name}</h3><span className={`bs-criterion-status bs-criterion-status--${lesson[criterion]}`}>{statusText(lesson[criterion])}</span></div>
-                      <p>{compactCriterion(criterion)}</p>
-                      {criterion === 'recognition' && lesson.recognitionRemediation &&
-                        <div className="bs-criterion-remediation" data-testid="recognition-remediation">
-                          <strong>{t.improveCriterion}</strong><p>{lesson.recognitionRemediation}</p>
-                        </div>}
-                      {criterion === 'reason' && lesson.reasonRemediation &&
-                        <div className="bs-criterion-remediation" data-testid="reason-remediation">
-                          <strong>{t.improveCriterion}</strong><p>{lesson.reasonRemediation}</p>
-                        </div>}
-                    </article>
-                  )}
-                </section>
-                <section className="bs-change-section" aria-label={t.change}>
-                  <h2>{t.itsMeaning}</h2><p>{lesson.responseMeaning}</p>
-                  <h2>{t.change}</h2><p>{lesson.response === 'supported' ? t.noChange : lesson.nextStep}</p>
-                  <h3>{t.alternatives}</h3><ul>{lesson.alternatives.map((a) => <li key={a}>{a}</li>)}</ul>
-                  <h2>{t.whyBetter}</h2><p>{lesson.why}</p>
-                  <details className="bs-expand"><summary>{t.details}</summary>
-                    <p><strong>{t.observationLabel}:</strong> {feedback.recognition}</p>
-                    <p><strong>{t.responseLabel}:</strong> {feedback.response}</p>
-                    <p><strong>{t.reasoningLabel}:</strong> {feedback.reason}</p>
-                  </details>
-                </section>
-              </> : <p className="bs-action-description">{t.noExplanation}</p>}
-              {canReview && currentEnding && <section className="bs-ending-card" data-testid="ending-review">
-                <span className="bs-ending-label">{t.ended} · {attempt.endingIndex + 1} / {scene.continuations.length}</span>
-                <h3>{tr(currentEnding.title, locale)}</h3>
-                {lesson?.endingMessage && <div className="bs-ending-takeaway"><strong>{t.outcomeLink}</strong><p>{lesson.endingMessage}</p></div>}
-                <details className="bs-expand"><summary>{t.continuationDetails}</summary><p>{tr(currentEnding.narrative, locale)}</p><p>{t.endingNotice}</p></details>
-                {attempt.endingIndex < scene.continuations.length - 1 ?
-                  <button type="button" className="bs-secondary bs-full" onClick={onNextEnding}>{t.nextEnding}<span aria-hidden="true">→</span></button> :
-                  <button type="button" className="bs-secondary bs-full" onClick={onReplayEndings}>{t.replay}<span aria-hidden="true">↺</span></button>}
-              </section>}
-              {scene.purpose === 'assessment' && <p className="bs-assessment-note">{t.assessmentReview}</p>}
-              <div className="bs-provisional"><span aria-hidden="true">ⓘ</span><span>{t.draft}</span></div>
-              {canContinue && <button type="button" className="bs-primary bs-next-action" onClick={onNextScene}>{t.nextScene}<span aria-hidden="true">→</span></button>}
-              {scene.condition === 'clear-view-control' && !canNextScene && <section className="bs-completed" data-testid="practice-completed"><h2>{t.complete}</h2><p>{t.completionHelp}</p></section>}
-              {canNextScene && !allTrainingEndingsSeen && <p className="bs-next-hint">{t.seenBoth}</p>}
-              <button type="button" className="bs-secondary bs-retry-action" onClick={onRestart}>{t.tryAgain}<span aria-hidden="true">↺</span></button>
-            </>}
+            {isReview && <p>{t.noExplanation}</p>}
           </section>
-        </div>
-        <footer className="bs-footer"><span>BLINDSPOT <span className="bs-footer-dim">/</span> PRACTICE INTERFACE</span><span className={storageStatus === 'available' ? '' : 'bs-footer-alert'}><span className="bs-footer-dot" />{storageLabel}</span></footer>
+        </div>}
+        <footer className="bs-footer">
+          <span>BlindSpot · {t.module}</span>
+          {showStorageWarning ? <span className="bs-storage-warning" role="status">{storageLabel}</span> :
+            <details className="bs-storage-detail"><summary>{t.storageDetail}</summary><span>{storageLabel}</span></details>}
+        </footer>
       </main>
     </div>
   );

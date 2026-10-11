@@ -225,5 +225,10 @@ test('actual PracticeScreen viewport binding uses the immutable-selection helper
   assert.match(source,/<SceneViewport\s+scene=\{scene\}\s+locale=\{locale\}\s+selected=\{regionSelectionForViewport\(scene, attempt\)\}/);
   assert.match(source,/data-testid="recognition-remediation"/);
   assert.match(source,/data-testid="reason-remediation"/);
-  assert.ok(source.indexOf('data-testid="recognition-remediation"') < source.indexOf('<details className="bs-expand"'));
+  const cardStart = source.indexOf('<div className="bs-criteria">');
+  const cardEnd = source.indexOf('<section className="bs-review-choices"', cardStart);
+  const cards = source.slice(cardStart,cardEnd);
+  assert.match(cards,/data-testid="recognition-remediation"/);
+  assert.match(cards,/data-testid="reason-remediation"/);
+  assert.doesNotMatch(cards,/<details/);
 });
