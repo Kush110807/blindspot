@@ -11,7 +11,7 @@ interface WelcomeCopy {
   readonly stepTitle: string; readonly steps: readonly Step[];
   readonly scopeTitle: string; readonly scope: readonly Scope[]; readonly limits: string;
   readonly roadmapTitle: string; readonly roadmap: readonly Roadmap[];
-  readonly closingTitle: string; readonly provisional: string; readonly navToPractice: string;
+  readonly closingTitle: string; readonly provisional: string; readonly navToPractice: string; readonly resume: string;
 }
 export const welcomeCopy: Record<Locale, WelcomeCopy> = {
   en: {
@@ -41,7 +41,7 @@ export const welcomeCopy: Record<Locale, WelcomeCopy> = {
     ],
     closingTitle:'Practise the decision before the outcome.',
     provisional:'Prototype guidance is provisional and awaits qualified instructor review.',
-    navToPractice:'Begin practice',
+    navToPractice:'Begin practice',resume:'Resume practice',
   },
   hi: {
     eyebrow:'दोपहिया वाहन चालकों के लिए सड़क-सुरक्षा अभ्यास',brandSub:'जो दिख नहीं रहा, उस पर भी ध्यान दें',
@@ -70,6 +70,6 @@ export const welcomeCopy: Record<Locale, WelcomeCopy> = {
     ],
     closingTitle:'नतीजे से पहले फ़ैसले का अभ्यास करें।',
     provisional:'प्रोटोटाइप की सलाह अभी प्रारंभिक है और योग्य प्रशिक्षकों की समीक्षा बाकी है।',
-    navToPractice:'अभ्यास शुरू करें',
+    navToPractice:'अभ्यास शुरू करें',resume:'अभ्यास जारी रखें',
   }
 };

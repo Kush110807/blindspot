@@ -32,13 +32,13 @@ python scripts/verify-artwork.py
 
 The **welcome page** contains a focused introduction, an explicit three-scene practice CTA, a two-ending bus demonstration, three short instructional steps, honest prototype scope, a current/planned/future development roadmap and a compact instructor-review warning. All text is authored in English and Hindi. The UI uses system fonts, a dark navy/teal theme, no stock photos or remote assets, and uncropped scene artwork.
 
-The demo begins closed. After choosing **Explore the example**, visitors can switch between **Nobody emerges** and **A pedestrian emerges**. Both states use the **exact same frozen bus background**. Only the transparent pedestrian overlay appears in the second outcome. Demo exploration **never** advances the actual training endings, creates attempts, locks choices, saves records, or changes replay state.
+The demo begins closed. After choosing **Explore the example**, visitors can switch between **Nobody emerges** and **A pedestrian emerges**. Both states use the **exact same frozen bus background**. Only the transparent pedestrian overlay appears in the second outcome. Demo exploration **never** advances the actual training endings, creates attempts, locks choices, saves records, or changes replay state. The practice header provides **Back to welcome**, and the welcome page then offers **Resume practice** in English/Hindi. Resume returns to the same scene, phase, locked decisions, and ending position without creating an attempt or record.
 
 **Start** is guarded against repeated activation, retains the selected language, scrolls to the top, and focuses the practice heading. It enters the **Scene 1 observation** phase, not answering, and does not create a saved record. The existing practice coordinator owns actual locale, attempts and persistence.
 
 ## Three-scene scope
 
-1. **Parked-bus training:** identify a potentially screened roadside, choose a response and main reason, lock your answer, then review **both** sequential endings. A lucky outcome does not retrospectively justify a weak decision.
+1. **Parked-bus training:** identify a potentially screened roadside, choose a response and main reason, lock your answer, then review **both** sequential endings. The review footer shows a disabled **Continue to next scene** and a direct **View the other ending** action until both endings have been viewed. A lucky outcome does not retrospectively justify a weak decision.
 2. **Unfamiliar road-layout assessment:** handle partial visibility near a side-street junction screened by a van.
 3. **Matched clear-view comparison:** decide whether the relevant obstruction is present; choosing **none** does not mean the whole road is safe.
 

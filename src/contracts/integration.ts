@@ -33,6 +33,8 @@ export interface PracticeScreenProps {
   readonly onRestart: () => void;
   readonly onNextScene: () => void;
   readonly onLocaleChange: (locale: Locale) => void;
+  /** Navigate to welcome without modifying the active practice session. */
+  readonly onBackToWelcome: () => void;
 }
 
 /** Optional aliases for selectable view props; B still authors all regions. */

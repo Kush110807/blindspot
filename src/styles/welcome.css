@@ -37,3 +37,6 @@
 @media(max-width:900px){.welcome-hero{grid-template-columns:1fr;padding:38px 0 45px}.welcome-hero-copy{max-width:680px}.welcome-steps-list,.welcome-scope-list{grid-template-columns:1fr;gap:17px}.welcome-step{padding-top:15px}.welcome-scope-list article{gap:7px}}
 @media(max-width:700px){.welcome-nav-inner{padding:11px 18px}.welcome-brand strong{font-size:21px}.welcome-brand small,.welcome-nav-start{display:none}.welcome-inner{padding:0 18px}.welcome-hero h1{font-size:clamp(30px,7.5vw,38px)}.welcome-hero{gap:24px}.welcome-primary{max-width:100%;width:100%;justify-content:space-between}.welcome-section{padding:42px 0}.welcome-section-intro h2{font-size:clamp(26px,6.6vw,32px)}.welcome-demo{grid-template-columns:1fr;padding:11px;gap:14px}.welcome-outcome-options{grid-template-columns:1fr}.welcome-steps-list{gap:20px}.welcome-scope-list{gap:19px}.welcome-hero-art .welcome-image-frame{box-shadow:none}.welcome-brand-mark{width:33px;height:33px;font-size:22px}.welcome-nav-actions{gap:7px}.welcome-lang button{min-width:40px;padding:5px 7px}}
 @media(prefers-reduced-motion:reduce){.welcome *{scroll-behavior:auto!important}}
+
+/* Resume remains visible on narrow screens after a practice session has started. */
+@media(max-width:700px){.welcome-nav-start.welcome-nav-resume{display:inline-flex;font-size:13px;gap:4px;padding:6px 8px;min-height:42px}}

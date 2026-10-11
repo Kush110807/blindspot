@@ -17,16 +17,20 @@ export default function App() {
     if (action.type === 'start') {
       if (startGuard.current) return;
       startGuard.current = true;
-      // Do not dispatch `begin`: entering practice must show Scene 1 observation.
+      // No `begin` dispatch: the first entry opens Scene 1 observation.
+    } else if (action.type === 'resume' && !startGuard.current) {
+      return; // Resume cannot create the first attempt.
     }
     welcomeDispatch(action);
   };
   useEffect(() => {
-    if (!welcome.entered) return;
     window.scrollTo(0, 0);
-    const heading = document.querySelector<HTMLElement>('.bs-main h1');
+    const headingSelector = !welcome.entered ? '#welcome-heading' :
+      view?.attempt.phase === 'review' && view.attempt.endingIndex > 0
+        ? '.bs-ending-card h3' : '.bs-main h1';
+    const heading = document.querySelector<HTMLElement>(headingSelector);
     if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
-  }, [welcome.entered]);
+  }, [welcome.entered, sceneId, view?.attempt.phase, view?.attempt.endingIndex]);
   const problems = catalogueErrors(scenes);
   const Screen = PracticeScreen;
   if (Screen && view && problems.length === 0) {
@@ -35,7 +39,7 @@ export default function App() {
     const callbacks: Pick<PracticeScreenProps,
       'onBegin' | 'onSelectRegion' | 'onSelectResponse' | 'onSelectReason' |
       'onLock' | 'onStartReview' | 'onNextEnding' | 'onReplayEndings' |
-      'onRestart' | 'onNextScene' | 'onLocaleChange'> = {
+      'onRestart' | 'onNextScene' | 'onLocaleChange' | 'onBackToWelcome'> = {
       onBegin: () => dispatch({ type: 'begin', sceneId }),
       onSelectRegion: selection => dispatch({ type: 'region', sceneId, selection }),
       onSelectResponse: responseId => dispatch({ type: 'response', sceneId, responseId }),
@@ -46,7 +50,8 @@ export default function App() {
       onReplayEndings: () => dispatch({ type: 'replay', sceneId }),
       onRestart: () => dispatch({ type: 'restart', sceneId, shuffleSeed: Math.random() }),
       onNextScene: () => dispatch({ type: 'next-scene', sceneId, shuffleSeed: Math.random() }),
-      onLocaleChange: locale => dispatch({ type: 'locale', locale })
+      onLocaleChange: locale => dispatch({ type: 'locale', locale }),
+      onBackToWelcome: () => handleWelcome({ type: 'back' })
     };
     return <Screen {...view} {...callbacks} />;
   }

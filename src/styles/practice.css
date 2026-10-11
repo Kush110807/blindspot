@@ -217,3 +217,13 @@
   .bs-review-area>span{font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){.bs-app *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Reversible welcome navigation and an explicit, discoverable sequential-ending gate. */
+.bs-back-welcome{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;min-height:44px;background:transparent;border:1px solid #496474;border-radius:8px;color:#e2f0f4;font-size:14px;font-weight:650;line-height:1.4}
+.bs-back-welcome:hover{background:#203849;border-color:#91ddd7}
+.bs-next-gate{display:flex;flex:1 1 100%;flex-wrap:wrap;align-items:center;gap:10px;border:1px solid #455968;border-radius:10px;padding:13px 15px;background:#112432}
+.bs-next-gate .bs-next-disabled{flex:1 1 200px;opacity:.65;background:#1a2b39;border-color:#60717a;color:#d1dbe0}
+.bs-next-gate .bs-next-hint{flex:1 1 195px;line-height:1.5}
+.bs-next-gate .bs-primary{flex:1 1 230px}
+@media(max-width:780px){.bs-next-gate{flex-direction:column;align-items:stretch}.bs-next-gate .bs-next-disabled,.bs-next-gate .bs-primary,.bs-next-gate .bs-next-hint{flex:none;width:100%}}
+@media(max-width:480px){.bs-topbar-tools{gap:8px}.bs-back-welcome{font-size:12px;padding:7px 8px;min-height:42px}.bs-back-welcome span{font-size:15px}.bs-brand small{display:none}.bs-topbar-inner{flex-wrap:wrap}.bs-topbar-tools{width:100%;justify-content:space-between}}

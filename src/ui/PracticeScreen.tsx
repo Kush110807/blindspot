@@ -53,7 +53,7 @@ const copy: Record<Locale, Record<string, string>> = {
     reasonDiffers: 'Your reason overlooks something in the initial view.',
     noChange: 'Your action is draft-supported. Keep adapting as you approach, and address any recognition or reasoning gaps shown above.',
     improveCriterion: 'How to improve this part',
-    nextScene: 'Continue to next scene', seenBoth: 'View both endings to continue',
+    nextScene: 'Continue to next scene', seenBoth: 'View both endings to continue.', backWelcome: 'Back to welcome',
     keepDoing: 'What to keep doing', submissionNeutral: 'Submitted, not scored',
     yourDecision: 'Your submitted decision', visualReview: 'Scene and outcome',
     assessmentScene: 'Initial assessment scene', feedbackGroup: 'Feedback by criterion',
@@ -107,7 +107,7 @@ const copy: Record<Locale, Record<string, string>> = {
     reasonDiffers: 'आपका कारण शुरुआती दृश्य की एक ज़रूरी बात छोड़ता है।',
     noChange: 'आपका कदम इस प्रारंभिक पाठ में समर्थित है। पास आते समय स्थिति देखते रहें और ऊपर बताई गई पहचान या कारण की कमी भी सुधारें।',
     improveCriterion: 'इस हिस्से को कैसे सुधारें',
-    nextScene: 'अगले दृश्य पर जाएँ', seenBoth: 'आगे जाने से पहले दोनों अंत देखें',
+    nextScene: 'अगले दृश्य पर जाएँ', seenBoth: 'आगे जाने के लिए दोनों परिणाम देखें।', backWelcome: 'स्वागत पृष्ठ पर जाएँ',
     keepDoing: 'आगे भी क्या करते रहें', submissionNeutral: 'उत्तर दर्ज हुआ, अंक नहीं मिले',
     yourDecision: 'आपका दर्ज किया गया निर्णय', visualReview: 'दृश्य और परिणाम',
     assessmentScene: 'मूल अभ्यास दृश्य', feedbackGroup: 'हर हिस्से पर प्रतिक्रिया',
@@ -124,7 +124,7 @@ export function PracticeScreen(props: PracticeScreenProps) {
   const {
     scene, attempt, locale, feedback, storageStatus, canNextScene,
     onBegin, onSelectRegion, onSelectResponse, onSelectReason, onLock,
-    onStartReview, onNextEnding, onReplayEndings, onRestart, onNextScene, onLocaleChange,
+    onStartReview, onNextEnding, onReplayEndings, onRestart, onNextScene, onLocaleChange, onBackToWelcome,
   } = props;
   const t = copy[locale];
   const isObserving = attempt.phase === 'observe';
@@ -216,7 +216,7 @@ export function PracticeScreen(props: PracticeScreenProps) {
       <header className="bs-topbar"><div className="bs-topbar-inner">
         <div className="bs-brand" aria-label="BlindSpot"><span className="bs-brand-icon" aria-hidden="true"><span/></span>
           <span><strong>BlindSpot</strong><small>{t.brandSub}</small></span></div>
-        <div className="bs-topbar-tools"><span className="bs-topbar-mode">{scene.purpose === 'training' ? t.training : t.assessment}</span>
+        <div className="bs-topbar-tools"><button type="button" className="bs-back-welcome" onClick={onBackToWelcome}><span aria-hidden="true">←</span> {t.backWelcome}</button><span className="bs-topbar-mode">{scene.purpose === 'training' ? t.training : t.assessment}</span>
           <div className="bs-lang" role="group" aria-label={t.unchanged}>
             <button type="button" className={locale === 'en' ? 'bs-lang-active' : ''} aria-pressed={locale === 'en'} onClick={() => onLocaleChange('en')}>EN</button>
             <button type="button" className={locale === 'hi' ? 'bs-lang-active' : ''} aria-pressed={locale === 'hi'} onClick={() => onLocaleChange('hi')}>हिंदी</button>
@@ -296,10 +296,14 @@ export function PracticeScreen(props: PracticeScreenProps) {
           </section>
           <div className="bs-provisional" role="note"><span aria-hidden="true">ⓘ</span> {t.draft}</div>
           <div className="bs-review-controls">
+            {scene.purpose === 'training' && !allTrainingEndingsSeen && <div className="bs-next-gate" data-testid="training-next-gate">
+              <button type="button" className="bs-secondary bs-next-disabled" disabled aria-describedby="bs-ending-gate-help">{t.nextScene}<span aria-hidden="true">→</span></button>
+              <p id="bs-ending-gate-help" className="bs-next-hint">{t.seenBoth}</p>
+              <button type="button" className="bs-primary" onClick={onNextEnding}>{t.nextEnding}<span aria-hidden="true">→</span></button>
+            </div>}
             {canContinue && <button type="button" className="bs-primary" onClick={onNextScene}>{t.nextScene}<span aria-hidden="true">→</span></button>}
-            {scene.condition === 'clear-view-control' && !canNextScene && <section className="bs-completed" data-testid="practice-completed">
+            {scene.condition === 'clear-view-control' && !canNextScene && <section className="bs-completed" data-testid="practice-completed" role="status">
               <h2>{t.complete}</h2><p>{t.completionHelp}</p></section>}
-            {canNextScene && !allTrainingEndingsSeen && <p className="bs-next-hint">{t.seenBoth}</p>}
             <button type="button" className="bs-secondary" onClick={onRestart}>{t.tryAgain}<span aria-hidden="true">↺</span></button>
           </div>
         </>}
