@@ -56,7 +56,7 @@ The learning review provides a choice-specific takeaway and visible criterion-sp
 
 The accepted red-bus image, full-frame pedestrian overlay and clear-junction background have fixed decoded-pixel hashes enforced by `scripts/verify-artwork.py`. The blocked junction is reconstructed exactly from the **fixed clear view plus the masked van and its local contact shadow**. Pixels outside the mask are never changed. The donor for the most recent van correction and its cutout mask are preserved under `assets/source-artwork/` as non-public build provenance; only the final transparent layer and blocked composite are served to learners. See [asset credits](docs/ASSET_CREDITS.md) and [welcome integration handoff](docs/WELCOME_FINAL_HANDOFF.md).
 
-The blocked scene version is `1.2.2-provisional`; the bus and clear scene versions remain `1.2.0-provisional`. All share scene schema v1 and stable answer IDs. Old snapshots must not be judged against changed image evidence.
+The blocked scene version is `1.2.3-provisional`; the bus and clear scene versions remain `1.2.0-provisional`. All share scene schema v1 and stable answer IDs. Old snapshots must not be judged against changed image evidence.
 
 ## Limitations and verification
 

@@ -9,7 +9,7 @@ This branch descends from accepted `400201bc3ebf610d24a6f6bbe245ffb3c42a949c` an
 - `src/welcome/content.ts` — complete English and Hindi text for all sections including roadmap, caveats and CTAs.
 - `src/styles/welcome.css` — editorial responsive navy/teal layout, system Hindi font fallback and keyboard focus.
 - `src/integration/welcomeFlow.ts` — separate ephemeral preview state; never stored in a practice attempt.
-- `src/content/scenes/unfamiliarBlocked.ts` — blocked artwork scene version `1.2.2-provisional` only. Existing hotspot stays at the right-hand partially screened junction; no semantic IDs or scoring mapping change.
+- `src/content/scenes/unfamiliarBlocked.ts` — blocked artwork scene version `1.2.3-provisional` only. Existing hotspot stays at the right-hand partially screened junction; no semantic IDs or scoring mapping change.
 - `public/scenes/unfamiliar-blocked-01/{van-shadow-layer.png,base.png}` — van cutout and contact shadow over fixed clear background. Existing bus and clear assets not edited.
 - `assets/source-artwork/` — preserved donor and foreground mask to allow exact deterministic rebuilding, not learner-facing.
 - `scripts/rebuild-van-layer.py`, `scripts/verify-artwork.py`, `tests/artworkIntegration.test.ts`, `tests/welcome.test.ts`, `README.md`, `index.html`, `docs/ASSET_CREDITS.md` — verification, regression coverage, repo/metadata documentation.

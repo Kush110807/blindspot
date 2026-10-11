@@ -18,7 +18,7 @@ test('revised scenes preserve stable IDs, unvalidated status and schema but bump
   assert.deepEqual(scenes.map(s => s.id), ['bus-training-01', 'unfamiliar-blocked-01', 'matched-clear-01']);
   for (const scene of scenes) {
     assert.equal(scene.schemaVersion, 1);
-    assert.equal(scene.sceneVersion, scene.id === 'unfamiliar-blocked-01' ? '1.2.2-provisional' : '1.2.0-provisional');
+    assert.equal(scene.sceneVersion, scene.id === 'unfamiliar-blocked-01' ? '1.2.3-provisional' : '1.2.0-provisional');
     assert.equal(scene.contentReview.status, 'provisional');
     assert.deepEqual(validateScene(scene), []);
     assert.deepEqual(pngDimensions(scene.base.src), { width: scene.base.width, height: scene.base.height });

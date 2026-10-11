@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Unfamiliar layout for a later, unscored blocked-view practice assessment. */
 export const unfamiliarBlockedScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.2.2-provisional',
+  sceneVersion: '1.2.3-provisional',
   id: 'unfamiliar-blocked-01',
   purpose: 'assessment',
   condition: 'blocked-view',

@@ -37,7 +37,7 @@ print('PASS: same frozen bus for both endings; no differences outside pedestrian
 
 clear=load('matched-clear-01/base.png')
 van=load('unfamiliar-blocked-01/van-shadow-layer.png')
-assert sha256(van.tobytes()).hexdigest()=='cbf0c5c5d81984f38a753a52495b86109032e8426a1808893f8d73b49ee2e7e8', 'unexpected repaired van/shadow pixels'
+assert sha256(van.tobytes()).hexdigest()=='5e98915a3a75b03d646d1b3038fb553a6a5042e63d0cff166f7dfc9934dacdf6', 'unexpected repaired van/shadow pixels'
 print('PASS: corrected van/shadow layer hash matched')
 blocked=load('unfamiliar-blocked-01/base.png')
 expected=Image.alpha_composite(clear,van).convert('RGB')
