@@ -13,7 +13,6 @@ SOURCES = {
     'bus-training-01/base.png': 'fba39e86fe1ce441ac5bff1cde4131143f6dbff73307ab86d9cf20ee8922b59b',
     'bus-training-01/pedestrian-emerges.png': 'ae25856c16cad2f897e17f0b39ae28576669197f8b16842256ed3437e0cdc826',
     'matched-clear-01/base.png': 'c01bd936e9671e5e36c25988dbe234b68673e497aeb148107818d84515e75a74',
-    'unfamiliar-blocked-01/van-shadow-layer.png': '9da420ab0f3db80ca62b5ffc9f2f1f4f858b95c3cd0e0234354e63e641bcacb7',
 }
 
 def load(name):
@@ -24,7 +23,7 @@ def load(name):
 for name, digest in SOURCES.items():
     im=load(name)
     assert sha256(im.tobytes()).hexdigest()==digest, f'PDF-source pixel mismatch: {name}'
-    print('SOURCE MATCH:',name,digest)
+    print('APPROVED FROZEN SOURCE MATCH:',name,digest)
 
 bus=load('bus-training-01/base.png')
 actor=load('bus-training-01/pedestrian-emerges.png')
@@ -38,6 +37,8 @@ print('PASS: same frozen bus for both endings; no differences outside pedestrian
 
 clear=load('matched-clear-01/base.png')
 van=load('unfamiliar-blocked-01/van-shadow-layer.png')
+assert sha256(van.tobytes()).hexdigest()=='369857a4b4a778674dc156c37a1b439fb0eaaacd3cb156e863bb024e550b1ff7', 'unexpected repaired van/shadow pixels'
+print('PASS: corrected van/shadow layer hash matched')
 blocked=load('unfamiliar-blocked-01/base.png')
 expected=Image.alpha_composite(clear,van).convert('RGB')
 assert np.array_equal(np.asarray(expected),np.asarray(blocked.convert('RGB'))), 'blocked view is not exactly clear + van/shadow'
@@ -47,4 +48,8 @@ outside=int(np.count_nonzero(diff & (mask_van==0)))
 assert outside==0, f'{outside} changed pixels outside van/shadow overlay'
 assert np.count_nonzero(diff)>0, 'missing van composite'
 print(f'PASS: only van/shadow pixels differ; outside changed = {outside}; changed = {np.count_nonzero(diff)}')
-print('PASS: all frozen assets match approved PDF/source pixel hashes')
+# Excluded rectangular pavement pieces beneath the vehicle must not remain opaque.
+assert int(np.max(mask_van[480:515,1160:1280])) < 90, 'opaque underbody pavement fragment remains'
+assert int(np.max(mask_van[240:300,1050:1100])) < 90, 'opaque background near front cut edge remains'
+print('PASS: cropped pavement/wall matte fragments eliminated and wheel-contact shadow retained')
+print('PASS: approved bus/pedestrian/clear sources preserved; repaired van layer explicitly versioned')

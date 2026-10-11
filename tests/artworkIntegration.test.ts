@@ -18,7 +18,7 @@ test('revised scenes preserve stable IDs, unvalidated status and schema but bump
   assert.deepEqual(scenes.map(s => s.id), ['bus-training-01', 'unfamiliar-blocked-01', 'matched-clear-01']);
   for (const scene of scenes) {
     assert.equal(scene.schemaVersion, 1);
-    assert.equal(scene.sceneVersion, '1.2.0-provisional');
+    assert.equal(scene.sceneVersion, scene.id === 'unfamiliar-blocked-01' ? '1.2.1-provisional' : '1.2.0-provisional');
     assert.equal(scene.contentReview.status, 'provisional');
     assert.deepEqual(validateScene(scene), []);
     assert.deepEqual(pngDimensions(scene.base.src), { width: scene.base.width, height: scene.base.height });
@@ -67,7 +67,10 @@ test('final PDF-sourced tap areas stay within normalized viewport and distinguis
   const vanScreen = blocked.tapRegions.find(r => r.id === 'beside-delivery-van')!.bounds;
   const openEntry = clear.tapRegions.find(r => r.id === 'open-right-entry')!.bounds;
   assert.ok(busHidden.x < opposing.x, 'bus-side hidden hazard is left of opposing SUV');
-  assert.ok(vanScreen.x < openEntry.x, 'occluding van forward edge lies left of open side-road approach');
+  assert.ok(vanScreen.x < openEntry.x, 'occlusion starts to the left of the open junction');
+  assert.ok(vanScreen.x + vanScreen.width > openEntry.x, 'junction hotspot extends into the van-screened approach');
+  assert.ok(vanScreen.y < openEntry.y + openEntry.height && vanScreen.y + vanScreen.height > openEntry.y, 'junction hotspot overlaps open entrance vertically');
+  assert.ok(vanScreen.x + vanScreen.width < 0.92, 'blocked hotspot remains focused on van/partly hidden entry, not the far pavement');
   assert.notDeepEqual(vanScreen, openEntry);
   assert.equal(blocked.rubric.acceptedRegionIds[0], 'beside-delivery-van');
   assert.deepEqual(clear.rubric.acceptedRegionIds, []);

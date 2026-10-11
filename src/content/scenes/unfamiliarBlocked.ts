@@ -3,7 +3,7 @@ import type { SceneDefinition } from '../../contracts/scene.ts';
 /** Unfamiliar layout for a later, unscored blocked-view practice assessment. */
 export const unfamiliarBlockedScene: SceneDefinition = {
   schemaVersion: 1,
-  sceneVersion: '1.2.0-provisional',
+  sceneVersion: '1.2.1-provisional',
   id: 'unfamiliar-blocked-01',
   purpose: 'assessment',
   condition: 'blocked-view',
@@ -35,10 +35,10 @@ export const unfamiliarBlockedScene: SceneDefinition = {
     {
       id: 'beside-delivery-van',
       label: {
-        en: 'Side-road approach partly screened past the front-left edge of the delivery van',
-        hi: 'डिलीवरी वैन के बाएँ अगले किनारे से आंशिक रूप से छिपा बगल की सड़क का हिस्सा',
+        en: 'Side-road junction partly concealed beyond the delivery van',
+        hi: 'डिलीवरी वैन के पीछे आंशिक रूप से छिपा बगल की सड़क का प्रवेश',
       },
-      bounds: { x: 0.638, y: 0.30, width: 0.133, height: 0.232 },
+      bounds: { x: 0.742, y: 0.248, width: 0.165, height: 0.279 },
     },
     {
       id: 'far-left-vehicle',
