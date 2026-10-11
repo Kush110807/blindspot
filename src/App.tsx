@@ -1,3 +1,6 @@
+import { useEffect, useReducer, useRef } from 'react';
+import { WelcomePage } from './welcome/WelcomePage.tsx';
+import { INITIAL_WELCOME_FLOW, welcomeReducer, type WelcomeAction } from './integration/welcomeFlow.ts';
 import { SCENE_SCHEMA_VERSION } from './contracts/scene.ts';
 import type { PracticeScreenProps } from './contracts/integration.ts';
 import { catalogueErrors } from './integration/coordinator.ts';
@@ -7,9 +10,28 @@ import { usePracticeCoordinator } from './integration/usePracticeCoordinator.ts'
 /** A owns composition; B/C exports are connected in integration/slots.ts after review. */
 export default function App() {
   const { session, dispatch, view, sceneId } = usePracticeCoordinator(scenes);
+  // Independent welcome reducer: its example is never a practice attempt.
+  const [welcome, welcomeDispatch] = useReducer(welcomeReducer, INITIAL_WELCOME_FLOW);
+  const startGuard = useRef(false);
+  const handleWelcome = (action: WelcomeAction) => {
+    if (action.type === 'start') {
+      if (startGuard.current) return;
+      startGuard.current = true;
+      // Do not dispatch `begin`: entering practice must show Scene 1 observation.
+    }
+    welcomeDispatch(action);
+  };
+  useEffect(() => {
+    if (!welcome.entered) return;
+    window.scrollTo(0, 0);
+    const heading = document.querySelector<HTMLElement>('.bs-main h1');
+    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+  }, [welcome.entered]);
   const problems = catalogueErrors(scenes);
   const Screen = PracticeScreen;
   if (Screen && view && problems.length === 0) {
+    if (!welcome.entered) return <WelcomePage locale={session.locale} flow={welcome} onAction={handleWelcome}
+      onLocaleChange={locale => dispatch({ type: 'locale', locale })} />;
     const callbacks: Pick<PracticeScreenProps,
       'onBegin' | 'onSelectRegion' | 'onSelectResponse' | 'onSelectReason' |
       'onLock' | 'onStartReview' | 'onNextEnding' | 'onReplayEndings' |

@@ -25,3 +25,10 @@
 Content Chat B must document **every new file** in `docs/CONTENT_NOTES_B.md` with: relative path, asset type, creator, date, original source URL/reference if external, license or usage permission, attribution obligations, native image dimensions, scene ID/version, region-overlay consistency, and whether the asset is a pre-lock image or a post-lock overlay. Do not use unlicensed external pictures or decorative proposal covers as verified road-scene maps.
 
 No qualified instructor approval, learner measurement or safety-effectiveness evidence is present at integration.
+
+## October 2026 final welcome/van integration
+
+- **Welcome page:** `src/welcome/WelcomePage.tsx`, `src/welcome/content.ts`, and `src/styles/welcome.css` were authored for BlindSpot. All English/Hindi copy is original prototype text. No remote fonts, third-party logos, stock road imagery or external illustration packages were introduced.
+- **Frozen bus/clear artwork:** The existing approved images and bus pedestrian overlay are reused unchanged; the decoded-pixel SHA-256 values remain enforced by `scripts/verify-artwork.py`.
+- **Latest van correction:** `assets/source-artwork/latest-van-correction-donor.png` is the AI-generated full-scene preview from the prior user-approved visual direction, stored only as **source provenance**, not served to learners as a replacement scene. `assets/source-artwork/final-van-foreground-mask.png` is a cutout mask derived from it. `scripts/rebuild-van-layer.py` reconstructs the transparent vehicle and localized wheel/contact shadow, then composites it onto the **unchanged** approved clear background. The public files are `public/scenes/unfamiliar-blocked-01/van-shadow-layer.png` and `base.png`. The final rendered image has zero changed pixels outside that alpha layer. The slight edge/matte differences at high zoom remain a visual-review consideration and do not imply instructor validation.
+- **Version:** Only `unfamiliar-blocked-01.sceneVersion` advances to `1.2.2-provisional` for changed visible evidence. No semantic IDs, locked-record schema, pre-existing lesson claims, or other scenes change.

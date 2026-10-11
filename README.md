@@ -1,22 +1,16 @@
 # BlindSpot
 
-**Practice decisions when the road ahead is hidden.**
+**The road looks clear. What can’t you see?**
 
-BlindSpot is a **three-scene, phone-friendly React + TypeScript prototype** for practising observation and decision reasoning when the view of the road is blocked. It is intended for adult novice two-wheeler riders. This is a authored illustrated learning exercise, **not a riding simulator, validated safety intervention or replacement for qualified instruction**.
+BlindSpot is a browser-based, three-scene road-visibility decision learning prototype for two-wheeler riders. A new bilingual welcome page introduces the problem, explains the learning principle with a **non-recorded** interactive preview, then starts the existing Scene 1 observation flow. No login, backend, remote AI, or personal details are required.
 
-**Integration status:** This branch combines the accepted A runtime (`1d711b14f96eaea9e3b311c10b260abe9ac2d08f`), B original scene implementation plus accepted content repair (`e0c6a0f` → `bcd0b5d`), and C original interface implementation plus accepted repair (`ac5e803` → `42175db`). Both worker histories remain in Git. The integrated candidate awaits independent acceptance. Nothing has been published or submitted.
+**Review status:** All scene guidance, candidate lesson alternatives and criterion feedback remain **provisional**, awaiting qualified road-safety instructor and Hindi-language review. No validated competence scores or claims of prevented crashes, improved road behaviour, or measured learning transfer are made.
 
-## Requirements
+## Get started
 
-- Node.js **22.16.x**, npm **10.x** (`package.json` requires Node `>=22.16.0 <23`)
-- A modern browser with JavaScript enabled
-- Network access for **the first dependency installation only**; no runtime API, login or server-side service
-
-## Clean installation and execution
+Use **Node.js 22.16.x** and **npm 10.x** with network access for the first installation:
 
 ```bash
-node --version
-npm --version
 npm ci
 npm run test
 npm run typecheck
@@ -25,60 +19,49 @@ npm run verify:repo
 npm run dev
 ```
 
-Visit Vite's local URL, normally `http://localhost:5173/`. For a production smoke test, stop the dev server and run `npm run preview` after a successful build.
+Visit the Vite local address, normally <http://localhost:5173/>. `npm run preview` serves an already completed production build. `npm run check` runs tests plus the production build. For strict pixel verification (Python environment with Pillow and NumPy), also run:
 
-| Command | Purpose |
-| --- | --- |
-| `npm ci` | Install exact locked versions from committed `package-lock.json`. |
-| `npm run dev` | Start development server. |
-| `npm run test` | Run Node contract, runtime and accepted-scene integration tests. |
-| `npm run typecheck` | Check full TypeScript app. |
-| `npm run build` | Typecheck and produce a Vite bundle in `dist/`. |
-| `npm run verify:repo` | Verify lockfile structure and tracked-file hygiene (must run on clean commit). |
-| `npm run check` | Test plus production build. |
-| `npm run preview` | Serve built application locally. |
+```bash
+python scripts/rebuild-van-layer.py
+python scripts/verify-artwork.py
+```
 
-### Actual verification scope
+`npm ci` uses the committed genuine `package-lock.json` (Vite 6.4.4). `node_modules`, `dist`, browser data, credentials and any local records are excluded from Git. Nothing has been published, deployed, or submitted.
 
-This artwork revision independently passes 53 contract, runtime and scene integration tests, including raster-asset checks, plus an exact pixel-layer invariant check. It **cannot complete `npm ci`** because the registry is unreachable and required package tarballs are not cached (notably Vite 6.4.4). Consequently the integrated React full typecheck/build **cannot be verified in this environment**. The previous Windows evidence showed a passing build of the **M1 foundation**, not this combined application. Desktop and 375px browser rendering, including accessibility and localStorage cases, must be performed on a machine where `npm ci` succeeds before integration acceptance. See `docs/ACCEPTED_WORKER_INTEGRATION.md` for the actual command results and outstanding UI verification steps. Do not treat this source-only integration as a finished release.
+## Visitor experience
 
-## Included scenes and functionality
+The **welcome page** contains a focused introduction, an explicit three-scene practice CTA, a two-ending bus demonstration, three short instructional steps, honest prototype scope, a current/planned/future development roadmap and a compact instructor-review warning. All text is authored in English and Hindi. The UI uses system fonts, a dark navy/teal theme, no stock photos or remote assets, and uncropped scene artwork.
 
-1. **Parked-bus training:** identify a region (or none), choose a response and a reason, lock, read provisional explanations based on the original evidence, then view **both** authored continuations and replay without resetting the recorded answer.
-2. **Unfamiliar blocked-view example:** an assessment-style changed layout, with explanation withheld until the attempt is locked and review is opened.
-3. **Matched clear-view control:** includes an explicit “no relevant blocked region” selection; caution is not automatically classified as wrong.
+The demo begins closed. After choosing **Explore the example**, visitors can switch between **Nobody emerges** and **A pedestrian emerges**. Both states use the **exact same frozen bus background**. Only the transparent pedestrian overlay appears in the second outcome. Demo exploration **never** advances the actual training endings, creates attempts, locks choices, saves records, or changes replay state.
 
-The interface supports English/Hindi scene and control text, 375px responsive layout authored by Chat C, scaled image tap rectangles plus selectable keyboard-accessible region controls, shuffle-safe response/reason IDs, immutable locked records, explicit restart/next navigation and client-side local record storage. Storage errors/corruption fall back to in-memory records without overwriting damaged storage. No personal information is requested or saved.
+**Start** is guarded against repeated activation, retains the selected language, scrolls to the top, and focuses the practice heading. It enters the **Scene 1 observation** phase, not answering, and does not create a saved record. The existing practice coordinator owns actual locale, attempts and persistence.
 
-**All explanations, provisional rubric candidates and accepted-response alternatives remain UNREVIEWED by a qualified instructor.** The app never displays validated correctness scores, aggregate competence scores or claimed crash reduction. No backend, account, learner study, driving physics engine or live AI is included. The matched assessment examples are authored static illustrations rather than a prediction of actual road risks.
+## Three-scene scope
 
-## Ownership and integration contracts
+1. **Parked-bus training:** identify a potentially screened roadside, choose a response and main reason, lock your answer, then review **both** sequential endings. A lucky outcome does not retrospectively justify a weak decision.
+2. **Unfamiliar road-layout assessment:** handle partial visibility near a side-street junction screened by a van.
+3. **Matched clear-view comparison:** decide whether the relevant obstruction is present; choosing **none** does not mean the whole road is safe.
 
-- **A:** `src/App.tsx`, `src/integration/`, `src/contracts/`, `src/engine/`, `src/records/`, build/dependencies, automated tests, release and repository documentation.
-- **B:** `src/content/scenes/`, `src/content/i18n/`, `public/scenes/`, `docs/CONTENT_NOTES_B.md`.
-- **C:** `src/ui/`, `src/styles/practice.css`, `docs/INTERFACE_NOTES_C.md`.
+The learning review provides a choice-specific takeaway and visible criterion-specific feedback for **recognition, response, and reasoning**, including supported, mistaken, mixed and conditional answers. Locked semantic IDs and marked regions are immutable; retry begins a new attempt instead of editing a submitted record. English/Hindi state survives navigation. In-browser local record storage degrades to in-memory handling if unavailable; corrupt data is preserved rather than overwritten.
 
-A's `src/integration/slots.ts` connects B's `scenes` named export to C's `PracticeScreen` named export. A alone owns locale state, progression, answer locking, persistence, review-gated feedback and navigation. See [contracts](docs/CONTRACTS.md), [ownership](docs/FILE_OWNERSHIP.md) and [integration evidence](docs/ACCEPTED_WORKER_INTEGRATION.md). The shared v1 schema and frozen B/C interfaces were not changed during integration.
+## Engineering and ownership
 
-## Assets, privacy and limitations
+- A/integration: `src/App.tsx`, `src/welcome/`, `src/integration/`, engine, shared contracts, storage, verification and packaging.
+- B/content: `src/content/scenes/` and scene assets. This final artwork integration intentionally updates only the blocked image and its version; semantic IDs, assessment mappings and stored-record schema remain untouched.
+- C/practice UI: `src/ui/`, `src/styles/practice.css`. Existing practice presentation and feedback are preserved.
 
-- Three full-resolution raster base scenes and the transparent pedestrian/van layers are bundled under `public/scenes/`. The blocked assessment is exactly the clear scene plus a transparent van/shadow layer, with no modified pixels outside the layer. See `docs/ARTWORK_LAYERED_INTEGRATION.md` and `docs/ASSET_CREDITS.md` for provenance and review status.
-- Brand/favicon are original vector/CSS work; no external fonts, stock photos, soundtrack, personal data, or private credentials are included. React and Vite retain their own package licenses.
-- All scene conditions and feedback are provisional; screenshots or programming tests do **not** constitute instructor validation or evidence of real-world safety benefit.
-- Corrupt local storage is retained without automatic replacement; a failed save means in-memory attempts may be lost after refresh. The local browser cannot guarantee secure storage.
-- Narrow-width browser emulation is not a physical phone test. Full browser, keyboard, storage, dev-console and responsive acceptance checks for this **combined** version are pending until dependencies can be installed.
-- No GitHub remote, deployment or submission has been authorised. The final repository should exclude `node_modules/`, `dist/`, credentials, local records and personal identifiers.
+`src/integration/slots.ts` connects the frozen B/C exports. No new third-party package was added.
 
-The proposal (`BlindSpot_Hackoverflow_Submission_Ready(1).pdf`) guided this scope but is not distributed in the repository. Additional sources and their non-validation status are recorded in the asset ledger. **No open-source project license is granted by this repository; decide repository visibility/license before publication.**
+## Assets and reproducibility
 
-## Result-review UX candidate (independent acceptance pending)
+The accepted red-bus image, full-frame pedestrian overlay and clear-junction background have fixed decoded-pixel hashes enforced by `scripts/verify-artwork.py`. The blocked junction is reconstructed exactly from the **fixed clear view plus the masked van and its local contact shadow**. Pixels outside the mask are never changed. The donor for the most recent van correction and its cutout mask are preserved under `assets/source-artwork/` as non-public build provenance; only the final transparent layer and blocked composite are served to learners. See [asset credits](docs/ASSET_CREDITS.md) and [welcome integration handoff](docs/WELCOME_FINAL_HANDOFF.md).
 
-The integrated application now leads locked review with a choice-specific takeaway, separate provisional recognition/response/reason comparisons, supported lesson alternatives, selected-versus-intended region overlays, and two response-linked bus-ending explanations. Review has expandable detail, retry creates a **new** attempt, and the clear-view final scene shows completion. No schema or saved-answer version changed; the same three authored scenarios remain with raster assets and bumped scene versions (`1.1.0-provisional`). This is a **review candidate**, not instructor validation or a finished safety assessment. See [result UX review notes](docs/RESULT_UX_REVIEW.md) for testing requirements and limitations.
+The blocked scene version is `1.2.2-provisional`; the bus and clear scene versions remain `1.2.0-provisional`. All share scene schema v1 and stable answer IDs. Old snapshots must not be judged against changed image evidence.
 
-## Layered artwork review (independent acceptance pending)
+## Limitations and verification
 
-The bus base and pedestrian are frozen after artwork approval; the pedestrian remains a post-lock overlay. The clear assessment street is the unaltered pixel background for the blocked view; only the separately stored van/shadow overlay changes the blocked image. `schemaVersion` remains 1 and scene IDs/response IDs/reason IDs are stable; all three `sceneVersion` values are now `1.1.0-provisional` to prevent reuse of older image evidence. See `docs/ARTWORK_LAYERED_INTEGRATION.md` and run `python scripts/verify-artwork.py` with Pillow and NumPy installed for strict pixel comparison. The real React/Vite rendering has **not** been verified in this environment while npm dependencies are unavailable.
+The prototype has **not** been evaluated with real riders or instructor-approved for safety advice. The welcome demo illustrates a possible outcome, not guaranteed collision avoidance. Its assessment scenes are authored examples rather than an exhaustive hazard test. The app does not prove learning transfer, retention or crash reduction. Local records are device/browser-specific; if storage is unavailable they may disappear after a refresh.
 
-## Final artwork source verification (pending running-app QA)
+Tests and pixel invariants must be distinguished from the **actual Vite application**. In this execution environment, npm installation could not complete because registry packages were inaccessible. Consequently the full production build and actual desktop/375px browser UI screenshots remain unverified here. See `docs/WELCOME_FINAL_HANDOFF.md` for commands, the exact failed gates and the browser acceptance matrix. Previous Windows M1 screenshots are not evidence for this revision.
 
-The 1.2.0-provisional imagery is restored from the approved PDF sources. The bus base is shared by both training endings; the pedestrian is a transparent post-lock overlay. The blocked assessment is an exact alpha composition of the frozen clear-junction background with the van/shadow layer. Run `python scripts/verify-artwork.py` (Pillow and NumPy required) to confirm source SHA-256 pixel hashes and zero changes outside the overlay. See `docs/ARTWORK_FINAL_SOURCE_VERIFICATION.md`. Browser acceptance on desktop and 375px has **not** been completed in this sandbox.
+Source attribution, conceptual references and provisional-status restrictions are recorded in `docs/ASSET_CREDITS.md`. No repository license or permission to publish has been granted.

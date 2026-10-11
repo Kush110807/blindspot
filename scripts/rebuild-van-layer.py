@@ -1,66 +1,36 @@
-"""Reproduce the October 2026 van cutout repair without regenerating scene art.
+"""Reconstruct final van/shadow layer from preserved source and foreground mask.
 
-The input is the van/shadow layer committed at the frozen parent SHA.
-Pillow is required. Run: python scripts/rebuild-van-layer.py [--write].
-Default mode verifies that the committed files exactly match a deterministic rebuild.
+Requires Pillow. Run `python scripts/rebuild-van-layer.py` to verify,
+`python scripts/rebuild-van-layer.py --write` to rebuild the committed assets.
+No scene or background is regenerated. No complete donor image is presented to learners.
 """
-from io import BytesIO
 from pathlib import Path
-import subprocess
-import sys
 from hashlib import sha256
 from PIL import Image, ImageDraw, ImageFilter
-
-ROOT = Path(__file__).resolve().parent.parent
-SOURCE_COMMIT = '28f1e7c94d224acc2feffba2c3e5eefdf54ec3b4'
-REL = 'public/scenes/unfamiliar-blocked-01/van-shadow-layer.png'
-PNG = subprocess.run(['git', 'show', f'{SOURCE_COMMIT}:{REL}'], cwd=ROOT, check=True, capture_output=True).stdout
-old = Image.open(BytesIO(PNG)).convert('RGBA')
-w, h = old.size
-assert (w, h) == (1672, 941)
-
-# Trace the existing van's visible outer boundary, excluding the tan wall and curb
-# accidentally present at the source cutout's front and undercarriage.
-poly = [
-    (1108,350),(1114,334),(1125,319),(1144,298),(1156,280),(1166,261),
-    (1371,189),(1395,185),(1489,186),(1514,192),(1521,207),(1522,450),
-    (1517,454),(1469,455),(1456,447),(1374,447),(1364,448),(1362,457),
-    (1355,470),(1348,475),(1320,478),(1305,474),(1299,464),(1293,435),
-    (1177,429),(1165,430),(1157,446),(1149,448),(1125,448),(1114,441),
-    (1107,432),(1102,421),(1101,404),(1103,381),(1104,365)
-]
-mask = Image.new('L', old.size)
-ImageDraw.Draw(mask).polygon(poly, fill=255)
-mask = mask.filter(ImageFilter.GaussianBlur(1.2))
-# A light-weight per-pixel alpha product, retaining the original van's visible pixels.
-from PIL import ImageChops
-alpha = ImageChops.multiply(old.getchannel('A'), mask)
-vehicle = old.copy()
-vehicle.putalpha(alpha)
-
-# Contact shadows are newly authored, translucent and feathered; they include no pavement pixels.
-shadow = Image.new('L', old.size)
-draw = ImageDraw.Draw(shadow)
-draw.ellipse((1087,424,1175,467), fill=95)
-draw.ellipse((1289,448,1374,488), fill=104)
-draw.polygon([(1125,435),(1505,437),(1541,472),(1373,480),(1250,456),(1148,452)], fill=50)
-shadow = shadow.filter(ImageFilter.GaussianBlur(9))
-shadow_layer = Image.new('RGBA', old.size, (31,34,34,0))
-shadow_layer.putalpha(shadow)
-layer = Image.alpha_composite(shadow_layer, vehicle)
-clear = Image.open(ROOT/'public/scenes/matched-clear-01/base.png').convert('RGBA')
-blocked = Image.alpha_composite(clear, layer).convert('RGB')
-
-out_layer = ROOT/REL
-out_blocked = ROOT/'public/scenes/unfamiliar-blocked-01/base.png'
+import sys
+root=Path(__file__).resolve().parent.parent
+source=Image.open(root/'assets/source-artwork/latest-van-correction-donor.png').convert('RGBA')
+mask=Image.open(root/'assets/source-artwork/final-van-foreground-mask.png').convert('L')
+clear=Image.open(root/'public/scenes/matched-clear-01/base.png').convert('RGBA')
+assert source.size == mask.size == clear.size == (1672,941)
+alpha=mask.filter(ImageFilter.GaussianBlur(.8))
+vehicle=source.copy();vehicle.putalpha(alpha)
+shadow=Image.new('L',source.size)
+d=ImageDraw.Draw(shadow)
+d.ellipse((1086,422,1161,465),fill=75)
+d.ellipse((1275,431,1400,505),fill=107)
+d.polygon([(1113,432),(1445,447),(1480,467),(1356,473),(1219,450)],fill=38)
+shadow=shadow.filter(ImageFilter.GaussianBlur(10))
+shadow_layer=Image.new('RGBA',source.size,(19,23,24,0));shadow_layer.putalpha(shadow)
+layer=Image.alpha_composite(shadow_layer,vehicle)
+blocked=Image.alpha_composite(clear,layer).convert('RGB')
+layer_path=root/'public/scenes/unfamiliar-blocked-01/van-shadow-layer.png'
+blocked_path=root/'public/scenes/unfamiliar-blocked-01/base.png'
 if '--write' in sys.argv:
-    layer.save(out_layer)
-    blocked.save(out_blocked)
-    print('Wrote updated layer and blocked composite')
+    layer.save(layer_path);blocked.save(blocked_path)
 else:
-    current = Image.open(out_layer).convert('RGBA')
-    actual = Image.open(out_blocked).convert('RGB')
-    assert current.tobytes() == layer.tobytes(), 'layer differs from deterministic rebuild'
-    assert actual.tobytes() == blocked.tobytes(), 'blocked scene differs from clear + rebuilt layer'
-    print('PASS: committed van cutout and blocked composite match deterministic rebuild')
-print('van decoded RGBA SHA256:', sha256(layer.tobytes()).hexdigest())
+    assert Image.open(layer_path).convert('RGBA').tobytes()==layer.tobytes(), 'van layer does not match preserved inputs'
+    assert Image.open(blocked_path).convert('RGB').tobytes()==blocked.tobytes(), 'blocked image does not match clear + layer'
+print('PASS: final van layer reconstructs from preserved donor and mask')
+print('PASS: blocked assessment is fixed clear view + reconstructed van/shadow only')
+print('van SHA256 RGBA:',sha256(layer.tobytes()).hexdigest())

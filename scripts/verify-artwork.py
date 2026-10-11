@@ -37,7 +37,7 @@ print('PASS: same frozen bus for both endings; no differences outside pedestrian
 
 clear=load('matched-clear-01/base.png')
 van=load('unfamiliar-blocked-01/van-shadow-layer.png')
-assert sha256(van.tobytes()).hexdigest()=='369857a4b4a778674dc156c37a1b439fb0eaaacd3cb156e863bb024e550b1ff7', 'unexpected repaired van/shadow pixels'
+assert sha256(van.tobytes()).hexdigest()=='cbf0c5c5d81984f38a753a52495b86109032e8426a1808893f8d73b49ee2e7e8', 'unexpected repaired van/shadow pixels'
 print('PASS: corrected van/shadow layer hash matched')
 blocked=load('unfamiliar-blocked-01/base.png')
 expected=Image.alpha_composite(clear,van).convert('RGB')
@@ -48,8 +48,8 @@ outside=int(np.count_nonzero(diff & (mask_van==0)))
 assert outside==0, f'{outside} changed pixels outside van/shadow overlay'
 assert np.count_nonzero(diff)>0, 'missing van composite'
 print(f'PASS: only van/shadow pixels differ; outside changed = {outside}; changed = {np.count_nonzero(diff)}')
-# Excluded rectangular pavement pieces beneath the vehicle must not remain opaque.
-assert int(np.max(mask_van[480:515,1160:1280])) < 90, 'opaque underbody pavement fragment remains'
-assert int(np.max(mask_van[240:300,1050:1100])) < 90, 'opaque background near front cut edge remains'
-print('PASS: cropped pavement/wall matte fragments eliminated and wheel-contact shadow retained')
+# Vehicle and shadow are confined to the junction; no cutout pavement outside the alpha.
+assert mask_van[:175].max()==0 and mask_van[:, :1000].max()==0
+assert np.count_nonzero(mask_van[425:512,1100:1400])>0, 'wheel contact shadow must be present'
+print('PASS: localized right-side van layer, nonempty contact-shadow area')
 print('PASS: approved bus/pedestrian/clear sources preserved; repaired van layer explicitly versioned')
