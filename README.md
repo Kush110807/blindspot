@@ -2,7 +2,11 @@
 
 **The road looks clear. What can’t you see?**
 
-**Live demonstration:** https://err404-blindspot.netlify.app/ (existing site link supplied by the project owner; this release-candidate commit has not been pushed or deployed).
+**Live demonstration:** https://err404-blindspot.netlify.app/
+
+**Source repository:** https://github.com/Kush110807/blindspot
+
+The prototype is deployed on Netlify, and its source is published on GitHub.
 
 BlindSpot is a three-scene, browser-based road-visibility practice prototype for two-wheeler riders. It asks learners to identify what a vehicle blocks from view, choose a response and reason **before** seeing an outcome, then reconsider the decision independently of whether that particular ending happened to be fortunate. A bilingual (English/हिन्दी) welcome page includes a non-recorded demonstration.
 
@@ -76,9 +80,3 @@ React, ReactDOM, Vite and TypeScript retain their own upstream license terms. Fo
 The accepted visual and learning scope descends from frozen product baseline `541e50e01f056297feaaef7e7f59c8d0fe08f172`. This focused follow-up adds only scene numbering, asset loading/error accessibility and neutral pre-answer scene descriptions; it does not change answer IDs, scene versions, stored records, feedback mapping or imagery. Planned instructor/Hindi review, matched unfamiliar assessment research, controlled comparisons, transfer/retention evaluation and broader scenario coverage are **future work**, not existing capabilities.
 
 The source package may be release-prepared without `dist` when dependency installation is unavailable. Check the release report for the actual commit-level verification evidence; do not mistake passing contract tests, older Windows screenshots, or source-image previews for a final React/Vite browser pass.
-
-## GitHub source repository — only after approval
-
-The included ZIP contains the existing `.git` directory and full history. **Do not initialise a new Git repository** inside the extracted project, replace the lockfile, or commit `node_modules`, `dist`, `.env`, personal records or logs. Check `docs/REPOSITORY_CHECKLIST.md` before sharing the source publicly. The static website at the link above is separate from the **GitHub source repository**, which has not been created or pushed by this handoff.
-
-When the owner authorises publication to a new empty GitHub repository, use the instructions in [docs/GITHUB_PUBLISHING.md](docs/GITHUB_PUBLISHING.md). If the destination already has Git commits, reconcile it without a force push. A project-wide source license and artwork use rights should be reviewed before choosing public visibility.
