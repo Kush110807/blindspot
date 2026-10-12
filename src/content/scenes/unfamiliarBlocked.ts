@@ -27,8 +27,8 @@ export const unfamiliarBlockedScene: SceneDefinition = {
     width: 1672,
     height: 941,
     alt: {
-      en: 'Semi-realistic rider-eye view: a white delivery van partly screens the right-hand side-road approach while its junction mouth and approaching lane remain identifiable; traffic is farther ahead on the left.',
-      hi: 'राइडर की नज़र से वास्तविकता के करीब दृश्य: सफेद डिलीवरी वैन दाईं ओर की जोड़ने वाली सड़क का कुछ हिस्सा छिपाती है, पर प्रवेश और मुख्य लेन दिखते हैं; बाईं ओर आगे ट्रैफ़िक मौजूद है।',
+      en: 'Rider-eye view of an Indian street with a white delivery van standing near a right-hand side-road entrance, a boundary wall and vehicles farther ahead.',
+      hi: 'भारतीय सड़क पर राइडर की नज़र से दृश्य। दाईं ओर छोटी सड़क के प्रवेश के पास सफेद डिलीवरी वैन खड़ी है। पास में चारदीवारी और आगे कुछ गाड़ियाँ दिखती हैं।',
     },
   },
   tapRegions: [

@@ -2,6 +2,8 @@
 
 **The road looks clear. What can’t you see?**
 
+**Live demonstration:** https://err404-blindspot.netlify.app/ (existing site link supplied by the project owner; this release-candidate commit has not been pushed or deployed).
+
 BlindSpot is a three-scene, browser-based road-visibility practice prototype for two-wheeler riders. It asks learners to identify what a vehicle blocks from view, choose a response and reason **before** seeing an outcome, then reconsider the decision independently of whether that particular ending happened to be fortunate. A bilingual (English/हिन्दी) welcome page includes a non-recorded demonstration.
 
 **Learning and safety limitation:** All scenarios, alternative responses and criterion-level feedback are **provisional**, not approved by a qualified road-safety instructor or Hindi-language reviewer. This is not an on-road safety certification, a validated test of riding skill, or evidence of fewer crashes or changed riding behaviour. No validated correctness score is displayed.
@@ -12,6 +14,7 @@ BlindSpot is a three-scene, browser-based road-visibility practice prototype for
 - Scene 1: parked-bus training, a locked decision, and **both sequential endings**. A lucky ending is not evidence that the earlier response was justified.
 - Scene 2: unfamiliar delivery-van side-road obstruction.
 - Scene 3: matched clear view; the learner can explicitly choose **no relevant blocked area**, without implying the whole road is hazard-free.
+- Scene progress is shown as Scene 1/2/3 of 3 (English and Hindi); essential scene images preserve their dimensions while loading and disable answering if unavailable. Asset failures are announced on screen.
 - Result review: choice-specific takeaway plus separate recognition, response and reasoning feedback, supported/conditional/reconsideration guidance, and an immutable locked snapshot. Retry makes a new attempt rather than rewriting a saved decision.
 - Browser-local records only; there is **no backend, account, live AI, tracking service, external font or remote scene image**. A storage error keeps in-memory practice available but can prevent persistence. Preview toggles do not write learner records or advance the actual endings.
 
@@ -70,6 +73,12 @@ React, ReactDOM, Vite and TypeScript retain their own upstream license terms. Fo
 
 ## Project limits and handoff
 
-The current three scenes and UI are **frozen** at product baseline `541e50e01f056297feaaef7e7f59c8d0fe08f172`. This deployment-preparation branch is documentation/build-hygiene only; it does not add learning features or alter answer IDs, scene versions, stored records or imagery. Planned instructor/Hindi review, matched unfamiliar assessment research, controlled comparisons, transfer/retention evaluation and broader scenario coverage are **future work**, not existing capabilities.
+The accepted visual and learning scope descends from frozen product baseline `541e50e01f056297feaaef7e7f59c8d0fe08f172`. This focused follow-up adds only scene numbering, asset loading/error accessibility and neutral pre-answer scene descriptions; it does not change answer IDs, scene versions, stored records, feedback mapping or imagery. Planned instructor/Hindi review, matched unfamiliar assessment research, controlled comparisons, transfer/retention evaluation and broader scenario coverage are **future work**, not existing capabilities.
 
 The source package may be release-prepared without `dist` when dependency installation is unavailable. Check the release report for the actual commit-level verification evidence; do not mistake passing contract tests, older Windows screenshots, or source-image previews for a final React/Vite browser pass.
+
+## GitHub source repository — only after approval
+
+The included ZIP contains the existing `.git` directory and full history. **Do not initialise a new Git repository** inside the extracted project, replace the lockfile, or commit `node_modules`, `dist`, `.env`, personal records or logs. Check `docs/REPOSITORY_CHECKLIST.md` before sharing the source publicly. The static website at the link above is separate from the **GitHub source repository**, which has not been created or pushed by this handoff.
+
+When the owner authorises publication to a new empty GitHub repository, use the instructions in [docs/GITHUB_PUBLISHING.md](docs/GITHUB_PUBLISHING.md). If the destination already has Git commits, reconcile it without a force push. A project-wide source license and artwork use rights should be reviewed before choosing public visibility.

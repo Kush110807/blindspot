@@ -50,3 +50,7 @@ Excluded from `dist`: source code, `.git`, dependencies, original donor/mask/tra
 A previous Windows run verified `npm ci`, production build and a foundation screen at an **earlier M1 commit**. That does not establish final-build or browser QA for the frozen navigation design. This package records new command results separately. If `npm ci` cannot resolve npm registry packages, mark typecheck/build and browser steps unverified; **do not deploy a guessed/dist-like artifact or claim a completed check**.
 
 No publication or submission is authorized by this handoff.
+
+## Existing demo and release status
+
+The project owner's existing demonstration URL is https://err404-blindspot.netlify.app/. This focused follow-up has **not** been deployed there. The GitHub repository steps are in `docs/GITHUB_PUBLISHING.md` and require explicit owner authorization. Full React/Vite install/build and live browser validation must be completed for the final SHA before claiming it matches the online demo.

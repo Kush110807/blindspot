@@ -1,3 +1,9 @@
+# GitHub repository readiness checklist
+
+**Current release:** 2026-10-12 focused scene-progress, image-loading accessibility and neutral alt-text improvements on `7246c71`. The live demo URL is documented, not redeployed or verified by this source-only task. This project has **not** been published to GitHub through this handoff.
+
+The original M1 integration workflow described later in this file is historical and must not be used as a fresh verification result.
+
 # GitHub repository readiness checklist (not yet authorised to publish)
 
 ## Status / blockers

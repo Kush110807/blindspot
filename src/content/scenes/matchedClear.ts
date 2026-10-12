@@ -27,8 +27,8 @@ export const matchedClearScene: SceneDefinition = {
     width: 1672,
     height: 941,
     alt: {
-      en: 'Semi-realistic rider-eye view of a visible side-street junction to the right with its full approach open; farther traffic appears on the left. Same road and camera as the blocked image, minus the van and shadow.',
-      hi: 'राइडर की नज़र से वास्तविकता के करीब दृश्य: दाईं ओर जोड़ने वाली सड़क का प्रवेश और उसके पास का रास्ता खुला दिखता है; बाईं ओर आगे ट्रैफ़िक है। कैमरा और सड़क वैन वाले दृश्य जैसे ही हैं, बस वैन और उसकी छाया नहीं हैं।',
+      en: 'Rider-eye view of a tree-lined Indian street. A narrow road joins from the right beside a boundary wall, with a scooter and other traffic farther ahead.',
+      hi: 'राइडर की नज़र से पेड़ों वाली भारतीय सड़क का दृश्य। दाईं ओर चारदीवारी के पास एक छोटी सड़क जुड़ती है और आगे स्कूटर व दूसरी गाड़ियाँ दिखाई देती हैं।',
     },
   },
   tapRegions: [

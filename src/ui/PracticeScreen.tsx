@@ -1,3 +1,6 @@
+import { useCallback, useState } from 'react';
+import { sceneProgressLabel } from '../integration/sceneProgress.ts';
+import type { AssetPhase } from './assetStatus.ts';
 import type { PracticeScreenProps } from '../contracts/integration.ts';
 import type { Locale, Translated } from '../contracts/scene.ts';
 import { translate } from '../contracts/scene.ts';
@@ -32,7 +35,7 @@ const copy: Record<Locale, Record<string, string>> = {
     noExplanation: 'Review text is not available for this attempt.',
     lockedTag: 'SUBMITTED', reviewedTag: 'REVIEW MODE', regionHelp: 'Every outlined location is a neutral selection option, not a correctness hint.',
     nextUnavailable: 'See both endings before continuing',
-    supported: 'Supported in this draft', conditional: 'Depends on conditions', reconsider: 'Revisit this choice',
+    supported: 'Aligned', conditional: 'Conditional', reconsider: 'Reconsider',
     draftComparison: 'Provisional lesson comparison — not an instructor-validated score',
     keyTakeaway: 'Your decision, explained', yourChoice: 'Your choice', itsMeaning: 'What it means in this scene',
     change: 'What to do differently', whyBetter: 'Why this addresses the visibility question',
@@ -58,7 +61,7 @@ const copy: Record<Locale, Record<string, string>> = {
     yourDecision: 'Your submitted decision', visualReview: 'Scene and outcome',
     assessmentScene: 'Initial assessment scene', feedbackGroup: 'Feedback by criterion',
     lessonDetails: 'More lesson context and draft alternatives', storageDetail: 'Storage details',
-    statusMixed: 'Mixed choices', statusSupported: 'Draft-supported overall',
+    statusMixed: 'Mixed choices', statusSupported: 'Aligned with the lesson',
     statusConditional: 'Conditions matter', statusReconsider: 'Reconsider the decision',
     detailIntro: 'Additional context', outcomeNoGuarantee: 'The ending does not determine whether the original choice was justified.',
   },
@@ -86,7 +89,7 @@ const copy: Record<Locale, Record<string, string>> = {
     noExplanation: 'इस प्रयास की समीक्षा उपलब्ध नहीं है।',
     lockedTag: 'जमा हुआ', reviewedTag: 'समीक्षा मोड', regionHelp: 'चिह्नित क्षेत्र केवल तटस्थ विकल्प हैं, सही उत्तर का संकेत नहीं।',
     nextUnavailable: 'आगे बढ़ने से पहले दोनों अंत देखें',
-    supported: 'इस मसौदे में समर्थित', conditional: 'परिस्थितियों पर निर्भर', reconsider: 'दोबारा विचार करें',
+    supported: 'मेल खाता है', conditional: 'शर्तों पर निर्भर', reconsider: 'फिर विचार करें',
     draftComparison: 'प्रारंभिक पाठ से तुलना — प्रशिक्षक द्वारा प्रमाणित स्कोर नहीं',
     keyTakeaway: 'आपके निर्णय का अर्थ', yourChoice: 'आपकी पसंद', itsMeaning: 'इस दृश्य में इसका मतलब',
     change: 'अगली बार क्या बदलें', whyBetter: 'यह दृश्य की समस्या को क्यों समझता है',
@@ -112,7 +115,7 @@ const copy: Record<Locale, Record<string, string>> = {
     yourDecision: 'आपका दर्ज किया गया निर्णय', visualReview: 'दृश्य और परिणाम',
     assessmentScene: 'मूल अभ्यास दृश्य', feedbackGroup: 'हर हिस्से पर प्रतिक्रिया',
     lessonDetails: 'अधिक संदर्भ और प्रारंभिक विकल्प', storageDetail: 'संग्रह की जानकारी',
-    statusMixed: 'मिश्रित विकल्प', statusSupported: 'मसौदे में समर्थित',
+    statusMixed: 'मिश्रित विकल्प', statusSupported: 'पाठ से मेल खाता है',
     statusConditional: 'परिस्थितियाँ महत्त्वपूर्ण हैं', statusReconsider: 'निर्णय पर फिर विचार करें',
     detailIntro: 'अधिक जानकारी', outcomeNoGuarantee: 'अंत के आधार पर शुरुआती निर्णय को सही या गलत नहीं माना जा सकता।',
   },
@@ -127,6 +130,14 @@ export function PracticeScreen(props: PracticeScreenProps) {
     onStartReview, onNextEnding, onReplayEndings, onRestart, onNextScene, onLocaleChange, onBackToWelcome,
   } = props;
   const t = copy[locale];
+  const [assetState, setAssetState] = useState<{ src: string; phase: AssetPhase }>(
+    { src: scene.base.src, phase: 'loading' }
+  );
+  const artworkReady = assetState.src === scene.base.src && assetState.phase === 'loaded';
+  const onBaseStatusChange = useCallback((src: string, phase: AssetPhase) => {
+    setAssetState(previous => previous.src === src && previous.phase === phase ? previous : { src, phase });
+  }, []);
+
   const isObserving = attempt.phase === 'observe';
   const isAnswering = attempt.phase === 'answering';
   const isLocked = attempt.phase === 'locked';
@@ -195,7 +206,8 @@ export function PracticeScreen(props: PracticeScreenProps) {
         <span className="bs-panel-subtle">{currentEnding ? t.continuation : t.original}</span>
       </div>
       <SceneViewport scene={scene} locale={locale} selected={regionSelectionForViewport(scene, attempt)}
-        canSelect={isAnswering} ending={currentEnding} review={canReview} onSelectRegion={onSelectRegion}/>
+        canSelect={isAnswering && artworkReady} ending={currentEnding} review={canReview}
+        onBaseStatusChange={onBaseStatusChange} onSelectRegion={selection => { if (artworkReady) onSelectRegion(selection); }}/>
       {isAnswering && <p className="bs-map-caption">{t.regionHelp}</p>}
       {canReview && lesson && <div className="bs-region-comparison" data-testid="region-comparison">
         <h3>{t.regionCompare}</h3>
@@ -228,7 +240,7 @@ export function PracticeScreen(props: PracticeScreenProps) {
             aria-current={index === phaseStep ? 'step' : undefined}>
             <span className="bs-step-number">{index < phaseStep ? '✓' : index + 1}</span>{step}</div>)}
         </nav>
-        <div className="bs-intro"><div><p className="bs-kicker">{scene.purpose === 'training' ? t.training : t.assessment}</p>
+        <div className="bs-intro"><div><p className="bs-scene-count" data-testid="scene-progress">{sceneProgressLabel(scene.id, locale)}</p><p className="bs-kicker">{scene.purpose === 'training' ? t.training : t.assessment}</p>
           <h1>{tr(scene.title, locale)}</h1>
           <p>{canReview ? t.reviewHint : tr(scene.prompt, locale)}</p></div></div>
 
@@ -313,7 +325,7 @@ export function PracticeScreen(props: PracticeScreenProps) {
           <section className="bs-action-panel" aria-live="polite" aria-label={[t.observe, t.decide, t.review][phaseStep]}>
             {isObserving && <>
               <h2>{t.observeTitle}</h2><p className="bs-action-description">{t.observeBody}</p>
-              <button type="button" className="bs-primary bs-observe-cta" onClick={onBegin}>{t.start}<span aria-hidden="true">→</span></button>
+              <button type="button" className="bs-primary bs-observe-cta" onClick={() => { if (artworkReady) onBegin(); }} disabled={!artworkReady}>{t.start}<span aria-hidden="true">→</span></button>
             </>}
             {isAnswering && <>
               <h2>{t.regionQuestion}</h2><p className="bs-action-description">{t.regionHint}</p>
@@ -321,18 +333,18 @@ export function PracticeScreen(props: PracticeScreenProps) {
                 <div className="bs-region-options" role="group" aria-label={t.selectable}>
                   {scene.tapRegions.map((region) => <button type="button" key={region.id} className={`bs-region-option${attempt.regionSelection?.kind === 'region' && attempt.regionSelection.regionId === region.id ? ' bs-option--selected' : ''}`}
                     aria-pressed={attempt.regionSelection?.kind === 'region' && attempt.regionSelection.regionId === region.id}
-                    onClick={() => onSelectRegion({kind:'region',regionId:region.id})}><span className="bs-option-radio" aria-hidden="true" />{tr(region.label,locale)}</button>)}
+                    disabled={!artworkReady} onClick={() => { if (artworkReady) onSelectRegion({kind:'region',regionId:region.id}); }}><span className="bs-option-radio" aria-hidden="true" />{tr(region.label,locale)}</button>)}
                   <button type="button" className={`bs-region-option bs-none-option${attempt.regionSelection?.kind === 'none' ? ' bs-option--selected' : ''}`}
-                    aria-pressed={attempt.regionSelection?.kind === 'none'} onClick={() => onSelectRegion({kind:'none'})}><span className="bs-option-radio" aria-hidden="true" />{tr(scene.noneLabel,locale)}</button>
+                    aria-pressed={attempt.regionSelection?.kind === 'none'} disabled={!artworkReady} onClick={() => { if (artworkReady) onSelectRegion({kind:'none'}); }}><span className="bs-option-radio" aria-hidden="true" />{tr(scene.noneLabel,locale)}</button>
                 </div></div>
               <div className="bs-field"><h3>{t.answer}</h3><div className="bs-choice-options" role="group" aria-label={t.answer}>
                 {orderedResponses.map((option) => <button type="button" className={`bs-choice-option${attempt.responseId === option.id ? ' bs-option--selected' : ''}`}
-                  key={option.id} aria-pressed={attempt.responseId === option.id} onClick={() => onSelectResponse(option.id)}><span className="bs-option-radio" aria-hidden="true" />{tr(option.label,locale)}</button>)}</div></div>
+                  key={option.id} aria-pressed={attempt.responseId === option.id} disabled={!artworkReady} onClick={() => { if (artworkReady) onSelectResponse(option.id); }}><span className="bs-option-radio" aria-hidden="true" />{tr(option.label,locale)}</button>)}</div></div>
               <div className="bs-field"><h3>{t.reason}</h3><div className="bs-choice-options" role="group" aria-label={t.reason}>
                 {orderedReasons.map((option) => <button type="button" className={`bs-choice-option${attempt.reasonId === option.id ? ' bs-option--selected' : ''}`}
-                  key={option.id} aria-pressed={attempt.reasonId === option.id} onClick={() => onSelectReason(option.id)}><span className="bs-option-radio" aria-hidden="true" />{tr(option.label,locale)}</button>)}</div></div>
-              <div className="bs-answer-submit"><p aria-live="polite">{canLock(attempt) ? t.ready : t.incomplete}</p>
-                <button type="button" className="bs-primary" onClick={onLock} disabled={!canLock(attempt)}>{t.lock}<span aria-hidden="true">→</span></button></div>
+                  key={option.id} aria-pressed={attempt.reasonId === option.id} disabled={!artworkReady} onClick={() => { if (artworkReady) onSelectReason(option.id); }}><span className="bs-option-radio" aria-hidden="true" />{tr(option.label,locale)}</button>)}</div></div>
+              <div className="bs-answer-submit"><p aria-live="polite">{!artworkReady ? (locale === 'hi' ? 'चित्र उपलब्ध होने पर उत्तर दिया जा सकता है।' : 'Answering is available once the scene image loads.') : canLock(attempt) ? t.ready : t.incomplete}</p>
+                <button type="button" className="bs-primary" onClick={() => { if (artworkReady && canLock(attempt)) onLock(); }} disabled={!artworkReady || !canLock(attempt)}>{t.lock}<span aria-hidden="true">→</span></button></div>
             </>}
             {isLocked && <>
               <div className="bs-locked-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>

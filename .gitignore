@@ -32,3 +32,11 @@ npm-debug.log*
 *.local
 /.vscode/
 /.idea/
+
+# Windows and test tooling files
+Thumbs.db
+Desktop.ini
+*.tsbuildinfo
+/playwright-report/
+/test-results/
+/.playwright/
